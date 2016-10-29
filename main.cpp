@@ -3,8 +3,10 @@
 
 #include <SDL2/SDL.h>
 #include <GL/glew.h>
+#include <assimp/scene.h>
 
 #include "graphics.hpp"
+#include "scene.hpp"
 
 #define PROJECT_NAME "Strategy Game"
 #define SCREEN_WIDTH 1280
@@ -76,6 +78,10 @@ int main (void)
 
                         std::cout << "Successfully initialised graphics sub-system." << std::endl;
 
+                        Engine::GL::Scene scene;
+
+                        scene.load("models/cube.obj");
+
                         while(!finished)
                         {
                             SDL_Event event;
@@ -91,6 +97,12 @@ int main (void)
                                     // TODO: Add other events.
                                 }
                             }
+
+                            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+                            scene.draw(graphics);
+
+                            SDL_GL_SwapWindow(window);
                         }
                     }
                     else

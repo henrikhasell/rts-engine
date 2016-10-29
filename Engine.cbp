@@ -30,7 +30,31 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++11" />
 		</Compiler>
+		<Linker>
+			<Add library="lua5.2" />
+			<Add library="assimp" />
+			<Add library="SDL2" />
+			<Add library="GL" />
+			<Add library="GLEW" />
+		</Linker>
+		<Unit filename="buffer.cpp" />
+		<Unit filename="buffer.hpp" />
+		<Unit filename="graphics.cpp" />
+		<Unit filename="graphics.hpp" />
+		<Unit filename="main.cpp" />
+		<Unit filename="mesh.cpp" />
+		<Unit filename="mesh.hpp" />
+		<Unit filename="models/cube.obj" />
+		<Unit filename="program.cpp" />
+		<Unit filename="program.hpp" />
+		<Unit filename="scene.cpp" />
+		<Unit filename="scene.hpp" />
+		<Unit filename="shader.cpp" />
+		<Unit filename="shader.hpp" />
+		<Unit filename="shaders/fragment.glsl" />
+		<Unit filename="shaders/vertex.glsl" />
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -17,14 +17,6 @@ Shader::~Shader()
     glDeleteShader(shader);
 }
 
-bool Shader::compile(std::string source)
-{
-    const GLchar *data = source.data();
-    glShaderSource(shader, 1, &data, nullptr);
-    glCompileShader(shader);
-    return compileStatus();
-}
-
 bool Shader::load(const char path[])
 {
     std::ifstream stream(path);
@@ -48,6 +40,14 @@ bool Shader::load(const char path[])
     }
 
     return false;
+}
+
+bool Shader::compile(std::string source)
+{
+    const GLchar *data = source.data();
+    glShaderSource(shader, 1, &data, nullptr);
+    glCompileShader(shader);
+    return compileStatus();
 }
 
 bool Shader::compileStatus()

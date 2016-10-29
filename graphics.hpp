@@ -12,6 +12,8 @@ namespace GL
 {
 class Graphics
 {
+friend class Mesh;
+
 public:
     Graphics();
     bool initialise();
@@ -24,9 +26,13 @@ private:
     glm::mat4x4 matrixV;
     glm::mat4x4 matrixM;
 
-    GLuint uniformP;
-    GLuint uniformV;
-    GLuint uniformM;
+    GLint uniformP;
+    GLint uniformV;
+    GLint uniformM;
+
+    GLint attributePosition;
+    GLint attributeNormal;
+    GLint attributeColour;
 }; // Graphics
 }; // GL
 }; // Engine

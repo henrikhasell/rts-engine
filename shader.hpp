@@ -15,8 +15,8 @@ friend class Program;
 public:
     Shader(GLenum type);
     ~Shader();
-    bool compile(std::string source);
     bool load(const char path[]);
+    bool compile(std::string source);
     bool compileStatus();
 private:
     GLuint shader;
