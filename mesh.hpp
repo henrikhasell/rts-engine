@@ -18,11 +18,13 @@ public:
     Mesh();
     ~Mesh();
     void setVertices(const std::vector<glm::vec4> &vertexArray);
+    void setNormals(const std::vector<glm::vec4> &normalArray);
     // void setColours(const std::vector<glm::vec4> &colourArray);
     void setIndices(const std::vector<GLuint> &indexArray);
     void draw(const Graphics &graphics);
 private:
     std::vector<glm::vec4> vertexArray;
+    std::vector<glm::vec4> normalArray;
     // std::vector<glm::vec4> colourArray;
     std::vector<GLuint> indexArray;
 

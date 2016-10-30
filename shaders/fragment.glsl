@@ -1,10 +1,11 @@
 #version 130
 
-// in  vec4 ex_Color;
+in vec4 ex_Position;
+in vec4 ex_Normal;
+
 out vec4 out_Color;
 
 void main(void)
 {
-	// out_Color = ex_Color;
-	out_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	out_Color = ex_Normal;
 }

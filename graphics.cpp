@@ -36,17 +36,22 @@ bool Graphics::initialise()
             {
                 glUseProgram(program.program);
 
-                uniformP = glGetUniformLocation(program.program, "projectionMatrix");
-                uniformV = glGetUniformLocation(program.program, "viewMatrix");
-                uniformM = glGetUniformLocation(program.program, "modelMatrix");
 
                 attributePosition = glGetAttribLocation(program.program, "in_Position");
                 attributeNormal = glGetAttribLocation(program.program, "in_Normal");
                 attributeColour = glGetAttribLocation(program.program, "in_Colour");
 
-                // std::cout << "Position: " << attributePosition << std::endl;
-                // std::cout << "Normal: " << attributeNormal << std::endl;
-                // std::cout << "Colour: " << attributeColour << std::endl;
+                std::cout << "in_Position attribute location: " << attributePosition << std::endl;
+                std::cout << "in_Normal attribute location: " << attributeNormal << std::endl;
+                std::cout << "in_Colour attribute location: " << attributeColour << std::endl;
+
+                uniformP = glGetUniformLocation(program.program, "projectionMatrix");
+                uniformV = glGetUniformLocation(program.program, "viewMatrix");
+                uniformM = glGetUniformLocation(program.program, "modelMatrix");
+
+                std::cout << "projectionMatrix: " << uniformP << std::endl;
+                std::cout << "viewMatrix: " << uniformV << std::endl;
+                std::cout << "modelMatrix: " << uniformM << std::endl;
 
                 glUniformMatrix4fv(uniformP, 1, GL_FALSE, &matrixP[0][0]);
                 glUniformMatrix4fv(uniformV, 1, GL_FALSE, &matrixV[0][0]);
@@ -63,12 +68,12 @@ bool Graphics::initialise()
         }
         else
         {
-            std::cerr << "Failed to compile vertex shader." << std::endl;
+            std::cerr << "Failed to compile vertex shader: " << vertexShader.compileLog() << std::endl;
         }
     }
     else
     {
-        std::cerr << "Failed to compile fragment shader." << std::endl;
+        std::cerr << "Failed to compile fragment shader: " << fragmentShader.compileLog() << std::endl;
     }
 
     return false;

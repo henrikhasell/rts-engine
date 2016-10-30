@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 using namespace Engine;
 using namespace GL;
@@ -55,4 +56,15 @@ bool Shader::compileStatus()
     GLint result;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
     return result == GL_TRUE;
+}
+
+
+std::string Shader::compileLog()
+{
+    GLint length;
+	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+
+    std::vector<char> buffer(length + 1);
+    glGetShaderInfoLog(shader, length, NULL, buffer.data());
+    return std::string(buffer.data());
 }

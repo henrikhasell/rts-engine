@@ -30,6 +30,7 @@ bool Scene::load(const char path[])
         aiMesh *mesh = scene->mMeshes[i];
 
         std::vector<glm::vec4> vertexBuffer;
+        std::vector<glm::vec4> normalBuffer;
         std::vector<GLuint> indexBuffer;
 
         for(unsigned int j = 0; j < mesh->mNumFaces; j++)
@@ -51,8 +52,11 @@ bool Scene::load(const char path[])
         for(unsigned int j = 0; j < mesh->mNumVertices; j++)
         {
             aiVector3D *vertex = mesh->mVertices + j;
+            aiVector3D *vertexN = mesh->mNormals + j;
             glm::vec4 position(vertex->x, vertex->y, vertex->z, 1.0);
+            glm::vec4 normal(vertexN->x, vertexN->y, vertexN->z, 1.0);
             vertexBuffer.push_back(position);
+            normalBuffer.push_back(normal);
         }
 
         this->mesh.emplace_back();
@@ -60,6 +64,7 @@ bool Scene::load(const char path[])
         Mesh &newMesh = this->mesh.back();
 
         newMesh.setVertices(vertexBuffer);
+        newMesh.setNormals(normalBuffer);
         newMesh.setIndices(indexBuffer);
     }
 

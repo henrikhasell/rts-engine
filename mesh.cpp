@@ -5,7 +5,7 @@ using namespace Engine;
 using namespace GL;
 
 #define VERTEX_BUFFER 1
-#define COLOUR_BUFFER 2
+#define NORMAL_BUFFER 2
 #define INDEX_BUFFER 3
 
 Mesh::Mesh()
@@ -32,6 +32,14 @@ void Mesh::setColours(const std::vector<glm::vec4> &colourArray)
     glBufferData(GL_ARRAY_BUFFER, colourArray.size() * sizeof(glm::vec4), colourArray.data(), GL_STATIC_DRAW);
 }
 */
+
+void Mesh::setNormals(const std::vector<glm::vec4> &normalArray)
+{
+    this->normalArray = normalArray;
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[NORMAL_BUFFER]);
+    glBufferData(GL_ARRAY_BUFFER, normalArray.size() * sizeof(glm::vec4), normalArray.data(), GL_STATIC_DRAW);
+}
+
 void Mesh::setIndices(const std::vector<GLuint> &indexArray)
 {
     this->indexArray = indexArray;
@@ -42,21 +50,21 @@ void Mesh::setIndices(const std::vector<GLuint> &indexArray)
 void Mesh::draw(const Graphics &graphics)
 {
     glEnableVertexAttribArray(graphics.attributePosition);
-    // glEnableVertexAttribArray(graphics.attributeColour);
+    glEnableVertexAttribArray(graphics.attributeNormal);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[VERTEX_BUFFER]);
     glVertexAttribPointer(graphics.attributePosition, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
-/*
-    glBindBuffer(GL_ARRAY_BUFFER, buffer[COLOUR_BUFFER]);
-    glVertexAttribPointer(graphics.attributeColour, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
-*/
+
+    glBindBuffer(GL_ARRAY_BUFFER, buffer[NORMAL_BUFFER]);
+    glVertexAttribPointer(graphics.attributeNormal, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[INDEX_BUFFER]);
     glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, (void*)0);
 
     glDisableVertexAttribArray(graphics.attributePosition);
-    // glDisableVertexAttribArray(graphics.attributeColour);
+    glDisableVertexAttribArray(graphics.attributeNormal);
 }
 
 #undef VERTEX_BUFFER
-#undef COLOUR_BUFFER
+#undef NORMAL_BUFFER
 #undef INDEX_BUFFER
