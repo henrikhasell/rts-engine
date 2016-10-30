@@ -6,12 +6,24 @@
 using namespace Engine;
 using namespace GL;
 
-Graphics::Graphics() :
+Graphics::Graphics(SDL_Window *window) :
     fragmentShader(GL_FRAGMENT_SHADER),
-    vertexShader(GL_VERTEX_SHADER),
-    program()
+    vertexShader(GL_VERTEX_SHADER)
 {
-    // matrixP = glm::perspective(45.0f, 1280.0f / 720.0f, 0.1f, 100.0f);
+    int w;
+    int h;
+
+    SDL_GetWindowSize(window, &w, &h);
+
+    GLfloat aspectRatio = (GLfloat)w/(GLfloat)h;
+
+    matrixP = glm::perspective(45.0f, aspectRatio, 0.1f, 10.0f);
+
+    matrixV = glm::lookAt(
+        glm::vec3(3.0, 3.0, 3.0),
+        glm::vec3(0.0, 0.0, 0.0),
+        glm::vec3(0.0, 1.0, 0.0)
+    );
 }
 
 bool Graphics::initialise()
@@ -28,12 +40,12 @@ bool Graphics::initialise()
                 uniformV = glGetUniformLocation(program.program, "viewMatrix");
                 uniformM = glGetUniformLocation(program.program, "modelMatrix");
 
-                attributePosition = glGetAttribLocation(program.program, "position");
-                //attributeNormal = glGetAttribLocation(program.program, "normal");
-                attributeColour = glGetAttribLocation(program.program, "colour");
+                attributePosition = glGetAttribLocation(program.program, "in_Position");
+                attributeNormal = glGetAttribLocation(program.program, "in_Normal");
+                attributeColour = glGetAttribLocation(program.program, "in_Colour");
 
                 // std::cout << "Position: " << attributePosition << std::endl;
-                //std::cout << "Normal: " << attributeNormal << std::endl;
+                // std::cout << "Normal: " << attributeNormal << std::endl;
                 // std::cout << "Colour: " << attributeColour << std::endl;
 
                 glUniformMatrix4fv(uniformP, 1, GL_FALSE, &matrixP[0][0]);

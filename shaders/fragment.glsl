@@ -1,10 +1,10 @@
 #version 130
 
-in vec4 colour;
+// in  vec4 ex_Color;
+out vec4 out_Color;
 
-out vec4 outColor;
-
-void main()
+void main(void)
 {
-    outColor = vec4(1.0, 1.0, 1.0, 1.0);
+	// out_Color = ex_Color;
+	out_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 }

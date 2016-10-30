@@ -17,15 +17,16 @@ class Mesh
 public:
     Mesh();
     ~Mesh();
-    void setVertices(const std::vector<glm::vec4> &vertices);
-    void setColours(const std::vector<glm::vec4> &colours);
+    void setVertices(const std::vector<glm::vec4> &vertexArray);
+    // void setColours(const std::vector<glm::vec4> &colourArray);
+    void setIndices(const std::vector<GLuint> &indexArray);
     void draw(const Graphics &graphics);
 private:
-    std::vector<glm::vec4> vertex;
-    std::vector<glm::vec4> colour;
+    std::vector<glm::vec4> vertexArray;
+    // std::vector<glm::vec4> colourArray;
+    std::vector<GLuint> indexArray;
 
-    GLuint vertexBuffer;
-    GLuint colourBuffer;
+    GLuint buffer[3];
 }; // Mesh
 }; // GL
 }; // Engine

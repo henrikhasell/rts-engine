@@ -68,7 +68,7 @@ int main (void)
 
                 if(glewResult == GLEW_OK)
                 {
-                    Engine::GL::Graphics graphics;
+                    Engine::GL::Graphics graphics(window);
 
                     std::cout << "Successfully loaded OpenGL extensions." << std::endl;
 
@@ -76,7 +76,7 @@ int main (void)
                     {
                         bool finished = false;
 
-                        std::cout << "Successfully initialised graphics sub-system." << std::endl;
+                        std::cout << "Successfully initialised the graphics sub-system." << std::endl;
 
                         Engine::GL::Scene scene;
 
@@ -100,6 +100,11 @@ int main (void)
 
                             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+                            for(int error = glGetError(); error != GL_NO_ERROR; error = glGetError())
+                            {
+                                std::cerr << "An OpenGL eror has occured: " << error << std::endl;
+                            }
+
                             scene.draw(graphics);
 
                             SDL_GL_SwapWindow(window);
@@ -107,7 +112,7 @@ int main (void)
                     }
                     else
                     {
-                        std::cerr << "Failed to initialise graphics sub-system." << std::endl;
+                        std::cerr << "Failed to initialise the graphics sub-system." << std::endl;
                     }
 
 

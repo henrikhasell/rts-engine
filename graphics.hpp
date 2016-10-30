@@ -4,6 +4,7 @@
 #include "shader.hpp"
 #include "program.hpp"
 
+#include <SDL2/SDL.h>
 #include <glm/mat4x4.hpp>
 
 namespace Engine
@@ -15,7 +16,7 @@ class Graphics
 friend class Mesh;
 
 public:
-    Graphics();
+    Graphics(SDL_Window *window);
     bool initialise();
 private:
     Shader fragmentShader;
