@@ -49,20 +49,22 @@ void Mesh::setIndices(const std::vector<GLuint> &indexArray)
 
 void Mesh::draw(const Graphics &graphics)
 {
-    glEnableVertexAttribArray(graphics.attributePosition);
-    glEnableVertexAttribArray(graphics.attributeNormal);
+    glUseProgram(graphics.program3D.program);
+
+    glEnableVertexAttribArray(graphics.attributePosition3D);
+    glEnableVertexAttribArray(graphics.attributeNormal3D);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[VERTEX_BUFFER]);
-    glVertexAttribPointer(graphics.attributePosition, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(graphics.attributePosition3D, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[NORMAL_BUFFER]);
-    glVertexAttribPointer(graphics.attributeNormal, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(graphics.attributeNormal3D, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[INDEX_BUFFER]);
     glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, (void*)0);
 
-    glDisableVertexAttribArray(graphics.attributePosition);
-    glDisableVertexAttribArray(graphics.attributeNormal);
+    glDisableVertexAttribArray(graphics.attributePosition3D);
+    glDisableVertexAttribArray(graphics.attributeNormal3D);
 }
 
 #undef VERTEX_BUFFER

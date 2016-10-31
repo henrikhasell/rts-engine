@@ -36,11 +36,14 @@
 			<Add library="lua5.2" />
 			<Add library="assimp" />
 			<Add library="SDL2" />
+			<Add library="SDL2_ttf" />
 			<Add library="GL" />
 			<Add library="GLEW" />
 		</Linker>
 		<Unit filename="buffer.cpp" />
 		<Unit filename="buffer.hpp" />
+		<Unit filename="font.cpp" />
+		<Unit filename="font.hpp" />
 		<Unit filename="graphics.cpp" />
 		<Unit filename="graphics.hpp" />
 		<Unit filename="main.cpp" />
@@ -53,8 +56,12 @@
 		<Unit filename="scene.hpp" />
 		<Unit filename="shader.cpp" />
 		<Unit filename="shader.hpp" />
-		<Unit filename="shaders/fragment.glsl" />
-		<Unit filename="shaders/vertex.glsl" />
+		<Unit filename="shaders/fragment2D.glsl" />
+		<Unit filename="shaders/fragment3D.glsl" />
+		<Unit filename="shaders/vertex2D.glsl" />
+		<Unit filename="shaders/vertex3D.glsl" />
+		<Unit filename="surface.cpp" />
+		<Unit filename="surface.hpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

@@ -14,26 +14,42 @@ namespace GL
 class Graphics
 {
 friend class Mesh;
+friend class Surface;
 
 public:
     Graphics(SDL_Window *window);
     bool initialise();
 private:
-    Shader fragmentShader;
-    Shader vertexShader;
-    Program program;
+    Shader fragmentShader3D;
+    Shader vertexShader3D;
+    Program program3D;
 
-    glm::mat4x4 matrixP;
-    glm::mat4x4 matrixV;
-    glm::mat4x4 matrixM;
+    glm::mat4x4 matrixP3D;
+    glm::mat4x4 matrixV3D;
+    glm::mat4x4 matrixM3D;
 
-    GLint uniformP;
-    GLint uniformV;
-    GLint uniformM;
+    GLint uniformP3D;
+    GLint uniformV3D;
+    GLint uniformM3D;
 
-    GLint attributePosition;
-    GLint attributeNormal;
-    GLint attributeColour;
+    GLint attributePosition3D;
+    GLint attributeNormal3D;
+
+    Shader fragmentShader2D;
+    Shader vertexShader2D;
+    Program program2D;
+
+    glm::mat4x4 matrixP2D;
+    glm::mat4x4 matrixV2D;
+    glm::mat4x4 matrixM2D;
+
+    GLint uniformTextureSampler2D;
+    GLint uniformP2D;
+    GLint uniformV2D;
+    GLint uniformM2D;
+
+    GLint attributePosition2D;
+    GLint attributeUV2D;
 }; // Graphics
 }; // GL
 }; // Engine

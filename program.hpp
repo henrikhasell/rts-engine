@@ -11,6 +11,8 @@ namespace GL
 class Program
 {
 friend class Graphics;
+friend class Mesh;
+friend class Surface;
 
 public:
     Program();

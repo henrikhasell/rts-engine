@@ -58,7 +58,6 @@ bool Shader::compileStatus()
     return result == GL_TRUE;
 }
 
-
 std::string Shader::compileLog()
 {
     GLint length;

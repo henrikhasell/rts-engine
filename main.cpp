@@ -2,13 +2,16 @@
 #include <lua5.2/lua.hpp>
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <GL/glew.h>
 #include <assimp/scene.h>
 
 #include "graphics.hpp"
+#include "surface.hpp"
 #include "scene.hpp"
+#include "font.hpp"
 
-#define PROJECT_NAME "Strategy Game"
+#define PROJECT_NAME "Shitty game engine."
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
@@ -41,99 +44,119 @@ int main (void)
     {
         std::cout << "Successfully initialised SDL2." << std::endl;
 
-        SDL_Window *window = SDL_CreateWindow(PROJECT_NAME,
-            SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED,
-            SCREEN_WIDTH,
-            SCREEN_HEIGHT,
-            SDL_WINDOW_OPENGL
-        );
-
-        if(window != nullptr)
+        if(TTF_Init() == 0)
         {
-            std::cout << "Successfully created SDL2 window." << std::endl;
+            std::cout << "Successfully initialised SDL2_TTF." << std::endl;
 
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-            SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+            SDL_Window *window = SDL_CreateWindow(PROJECT_NAME,
+                SDL_WINDOWPOS_UNDEFINED,
+                SDL_WINDOWPOS_UNDEFINED,
+                SCREEN_WIDTH,
+                SCREEN_HEIGHT,
+                SDL_WINDOW_OPENGL
+            );
 
-            SDL_GLContext context = SDL_GL_CreateContext(window);
-
-            if(context != nullptr)
+            if(window != nullptr)
             {
-                std::cout << "Successfully created OpenGL context." << std::endl;
+                std::cout << "Successfully created SDL2 window." << std::endl;
 
-                GLenum glewResult = glewInit();
+                SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+                SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+                SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-                if(glewResult == GLEW_OK)
+                SDL_GLContext context = SDL_GL_CreateContext(window);
+
+                if(context != nullptr)
                 {
-                    Engine::GL::Graphics graphics(window);
+                    std::cout << "Successfully created OpenGL context." << std::endl;
 
-                    std::cout << "Successfully loaded OpenGL extensions." << std::endl;
+                    GLenum glewResult = glewInit();
 
-                    if(graphics.initialise() == true)
+                    if(glewResult == GLEW_OK)
                     {
-                        bool finished = false;
+                        Engine::GL::Graphics graphics(window);
 
-                        std::cout << "Successfully initialised the graphics sub-system." << std::endl;
+                        std::cout << "Successfully loaded OpenGL extensions." << std::endl;
 
-                        Engine::GL::Scene scene;
-
-                        scene.load("models/teapot.obj");
-
-                        while(!finished)
+                        if(graphics.initialise() == true)
                         {
-                            SDL_Event event;
+                            bool finished = false;
 
-                            while(SDL_PollEvent(&event) != 0)
+                            std::cout << "Successfully initialised the graphics sub-system." << std::endl;
+
+                            Engine::GL::Scene scene;
+                            Engine::GL::TTF::Font font;
+
+                            scene.load("models/teapot.obj");
+
+                            if(font.load("fonts/NanumGothicCoding-Bold.ttf") == true)
                             {
-                                if(event.type == SDL_QUIT)
-                                {
-                                    finished = true;
-                                }
-                                else
-                                {
-                                    // TODO: Add other events.
-                                }
+                                std::cout << "Successfully loaded font." << std::endl;
                             }
 
-                            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+                            Engine::GL::Surface surface = font.renderString("안녕하세요, 세계!");
 
-                            for(int error = glGetError(); error != GL_NO_ERROR; error = glGetError())
+                            while(!finished)
                             {
-                                std::cerr << "An OpenGL eror has occured: " << error << std::endl;
+                                SDL_Event event;
+
+                                while(SDL_PollEvent(&event) != 0)
+                                {
+                                    if(event.type == SDL_QUIT)
+                                    {
+                                        finished = true;
+                                    }
+                                    else
+                                    {
+                                        // TODO: Add other events.
+                                    }
+                                }
+
+                                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+                                for(int error = glGetError(); error != GL_NO_ERROR; error = glGetError())
+                                {
+                                    std::cerr << "An OpenGL eror has occured: " << error << std::endl;
+                                }
+
+                                scene.draw(graphics);
+                                surface.draw(graphics);
+
+                                SDL_GL_SwapWindow(window);
                             }
-
-                            scene.draw(graphics);
-
-                            SDL_GL_SwapWindow(window);
                         }
+                        else
+                        {
+                            std::cerr << "Failed to initialise the graphics sub-system." << std::endl;
+                        }
+
+
                     }
                     else
                     {
-                        std::cerr << "Failed to initialise the graphics sub-system." << std::endl;
+                        std::cerr << "Failed to load OpenGL extensions: " << glewGetErrorString(glewResult) << std::endl;
                     }
 
-
+                    SDL_GL_DeleteContext(context);
                 }
                 else
                 {
-                    std::cerr << "Failed to load OpenGL extensions: " << glewGetErrorString(glewResult) << std::endl;
+                    std::cerr << "Failed to create OpenGL context:" << SDL_GetError() << std::endl;
                 }
 
-                SDL_GL_DeleteContext(context);
+                SDL_DestroyWindow(window);
             }
             else
             {
-                std::cerr << "Failed to create OpenGL context:" << SDL_GetError() << std::endl;
+                std::cerr << "Failed to create SDL2 window:" << SDL_GetError() << std::endl;
             }
 
-            SDL_DestroyWindow(window);
+            TTF_Quit();
         }
         else
         {
-            std::cerr << "Failed to create SDL2 window:" << SDL_GetError() << std::endl;
+            std::cerr << "Failed to initialise SDL2_TTF: " << TTF_GetError() << std::endl;
         }
 
         SDL_Quit();

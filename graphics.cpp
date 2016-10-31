@@ -7,8 +7,10 @@ using namespace Engine;
 using namespace GL;
 
 Graphics::Graphics(SDL_Window *window) :
-    fragmentShader(GL_FRAGMENT_SHADER),
-    vertexShader(GL_VERTEX_SHADER)
+    fragmentShader3D(GL_FRAGMENT_SHADER),
+    vertexShader3D(GL_VERTEX_SHADER),
+    fragmentShader2D(GL_FRAGMENT_SHADER),
+    vertexShader2D(GL_VERTEX_SHADER)
 {
     int w;
     int h;
@@ -17,51 +19,100 @@ Graphics::Graphics(SDL_Window *window) :
 
     GLfloat aspectRatio = (GLfloat)w/(GLfloat)h;
 
-    matrixP = glm::perspective(45.0f, aspectRatio, 0.1f, 10.0f);
+    matrixP3D = glm::perspective(45.0f, aspectRatio, 0.1f, 10.0f);
 
-    matrixV = glm::lookAt(
+    matrixV3D = glm::lookAt(
         glm::vec3(0.0, 3.0, 5.0),
         glm::vec3(0.0, 0.0, 0.0),
         glm::vec3(0.0, 1.0, 0.0)
     );
 
-    matrixV = glm::scale(matrixV, glm::vec3(0.03, 0.03, 0.03));
+    matrixV3D = glm::scale(matrixV3D, glm::vec3(0.03, 0.03, 0.03));
+
+    matrixP2D = glm::ortho(0.0f, (GLfloat)w, (GLfloat)h, 0.0f);
 }
 
 bool Graphics::initialise()
 {
-    if(fragmentShader.load("shaders/fragment.glsl") == true)
+    if(fragmentShader3D.load("shaders/fragment3D.glsl") == true)
     {
-        if(vertexShader.load("shaders/vertex.glsl") == true)
+        if(vertexShader3D.load("shaders/vertex3D.glsl") == true)
         {
-            if(program.link(fragmentShader, vertexShader) == true)
+            if(program3D.link(fragmentShader3D, vertexShader3D) == true)
             {
-                glUseProgram(program.program);
+                glUseProgram(program3D.program);
 
 
-                attributePosition = glGetAttribLocation(program.program, "in_Position");
-                attributeNormal = glGetAttribLocation(program.program, "in_Normal");
-                attributeColour = glGetAttribLocation(program.program, "in_Colour");
+                attributePosition3D = glGetAttribLocation(program3D.program, "in_Position");
+                attributeNormal3D = glGetAttribLocation(program3D.program, "in_Normal");
 
-                std::cout << "in_Position attribute location: " << attributePosition << std::endl;
-                std::cout << "in_Normal attribute location: " << attributeNormal << std::endl;
-                std::cout << "in_Colour attribute location: " << attributeColour << std::endl;
+                std::cout << "[3D] in_Position attribute location: " << attributePosition3D << std::endl;
+                std::cout << "[3D] in_Normal attribute location: " << attributeNormal3D << std::endl;
 
-                uniformP = glGetUniformLocation(program.program, "projectionMatrix");
-                uniformV = glGetUniformLocation(program.program, "viewMatrix");
-                uniformM = glGetUniformLocation(program.program, "modelMatrix");
+                uniformP3D = glGetUniformLocation(program3D.program, "projectionMatrix");
+                uniformV3D = glGetUniformLocation(program3D.program, "viewMatrix");
+                uniformM3D = glGetUniformLocation(program3D.program, "modelMatrix");
 
-                std::cout << "projectionMatrix: " << uniformP << std::endl;
-                std::cout << "viewMatrix: " << uniformV << std::endl;
-                std::cout << "modelMatrix: " << uniformM << std::endl;
+                std::cout << "[3D] projectionMatrix: " << uniformP3D << std::endl;
+                std::cout << "[3D] viewMatrix: " << uniformV3D << std::endl;
+                std::cout << "[3D] modelMatrix: " << uniformM3D << std::endl;
 
-                glUniformMatrix4fv(uniformP, 1, GL_FALSE, &matrixP[0][0]);
-                glUniformMatrix4fv(uniformV, 1, GL_FALSE, &matrixV[0][0]);
-                glUniformMatrix4fv(uniformM, 1, GL_FALSE, &matrixM[0][0]);
+                glUniformMatrix4fv(uniformP3D, 1, GL_FALSE, &matrixP3D[0][0]);
+                glUniformMatrix4fv(uniformV3D, 1, GL_FALSE, &matrixV3D[0][0]);
+                glUniformMatrix4fv(uniformM3D, 1, GL_FALSE, &matrixM3D[0][0]);
 
-                glEnable(GL_DEPTH_TEST);
+                if(fragmentShader2D.load("shaders/fragment2D.glsl") == true)
+                {
+                    if(vertexShader2D.load("shaders/vertex2D.glsl") == true)
+                    {
+                        if(program2D.link(fragmentShader2D, vertexShader2D) == true)
+                        {
+                            glUseProgram(program2D.program);
 
-                return true;
+                            attributePosition2D = glGetAttribLocation(program2D.program, "in_Position");
+                            attributeUV2D = glGetAttribLocation(program2D.program, "in_UV");
+
+                            std::cout << "[2D] in_Position attribute location: " << attributePosition2D << std::endl;
+                            std::cout << "[2D] in_UV attribute location: " << attributeUV2D << std::endl;
+
+                            uniformTextureSampler2D = glGetUniformLocation(program2D.program, "textureSampler");
+                            uniformP2D = glGetUniformLocation(program2D.program, "projectionMatrix");
+                            uniformV2D = glGetUniformLocation(program2D.program, "viewMatrix");
+                            uniformM2D = glGetUniformLocation(program2D.program, "modelMatrix");
+
+                            glUniformMatrix4fv(uniformP2D, 1, GL_FALSE, &matrixP2D[0][0]);
+                            glUniformMatrix4fv(uniformV2D, 1, GL_FALSE, &matrixV2D[0][0]);
+                            glUniformMatrix4fv(uniformM2D, 1, GL_FALSE, &matrixM2D[0][0]);
+
+                            std::cout << "[2D] textureSampler: " << uniformTextureSampler2D << std::endl;
+                            std::cout << "[2D] projectionMatrix: " << uniformP3D << std::endl;
+                            std::cout << "[2D] viewMatrix: " << uniformV3D << std::endl;
+                            std::cout << "[2D] modelMatrix: " << uniformM3D << std::endl;
+
+                            glEnable(GL_DEPTH_TEST);
+                            glEnable(GL_BLEND);
+
+                            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+                            glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+                            return true;
+
+                        }
+                        else
+                        {
+                            std::cerr << "Failed to link program." << std::endl;
+                        }
+                    }
+                    else
+                    {
+                        std::cerr << "Failed to compile vertex shader: " << vertexShader2D.compileLog() << std::endl;
+                    }
+                }
+                else
+                {
+                    std::cerr << "Failed to compile fragment shader: " << fragmentShader2D.compileLog() << std::endl;
+                }
             }
             else
             {
@@ -70,12 +121,12 @@ bool Graphics::initialise()
         }
         else
         {
-            std::cerr << "Failed to compile vertex shader: " << vertexShader.compileLog() << std::endl;
+            std::cerr << "Failed to compile vertex shader: " << vertexShader3D.compileLog() << std::endl;
         }
     }
     else
     {
-        std::cerr << "Failed to compile fragment shader: " << fragmentShader.compileLog() << std::endl;
+        std::cerr << "Failed to compile fragment shader: " << fragmentShader3D.compileLog() << std::endl;
     }
 
     return false;
