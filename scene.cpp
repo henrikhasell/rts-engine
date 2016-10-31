@@ -23,7 +23,7 @@ Scene::~Scene()
 
 bool Scene::load(const char path[])
 {
-    const aiScene *scene = aiImportFile(path, aiProcessPreset_TargetRealtime_MaxQuality);
+    const aiScene *scene = aiImportFile(path, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals);
 
     for(unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
@@ -37,12 +37,6 @@ bool Scene::load(const char path[])
         {
             aiFace *face = mesh->mFaces + j;
 
-            if(face->mNumIndices != 3)
-            {
-                std::cerr << "Face is not triangular." << std::endl;
-                continue;
-            }
-
             for(unsigned int k = 0; k < face->mNumIndices; k++)
             {
                 indexBuffer.emplace_back(face->mIndices[k]);
@@ -53,8 +47,10 @@ bool Scene::load(const char path[])
         {
             aiVector3D *vertex = mesh->mVertices + j;
             aiVector3D *vertexN = mesh->mNormals + j;
+
             glm::vec3 position(vertex->x, vertex->y, vertex->z);
             glm::vec3 normal(vertexN->x, vertexN->y, vertexN->z);
+
             vertexBuffer.push_back(position);
             normalBuffer.push_back(normal);
         }

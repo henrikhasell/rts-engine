@@ -80,7 +80,7 @@ int main (void)
 
                         Engine::GL::Scene scene;
 
-                        scene.load("models/cube.obj");
+                        scene.load("models/teapot.obj");
 
                         while(!finished)
                         {

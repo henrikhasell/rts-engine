@@ -20,10 +20,12 @@ Graphics::Graphics(SDL_Window *window) :
     matrixP = glm::perspective(45.0f, aspectRatio, 0.1f, 10.0f);
 
     matrixV = glm::lookAt(
-        glm::vec3(3.0, 3.0, 3.0),
+        glm::vec3(0.0, 3.0, 5.0),
         glm::vec3(0.0, 0.0, 0.0),
         glm::vec3(0.0, 1.0, 0.0)
     );
+
+    matrixV = glm::scale(matrixV, glm::vec3(0.03, 0.03, 0.03));
 }
 
 bool Graphics::initialise()
