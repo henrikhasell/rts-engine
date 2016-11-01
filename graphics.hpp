@@ -14,11 +14,16 @@ namespace GL
 class Graphics
 {
 friend class Mesh3D;
-friend class Surface;
+friend class Mesh2D;
+friend class Texture;
 
 public:
     Graphics(SDL_Window *window);
     bool initialise();
+    void begin2D();
+    void begin3D();
+    void end2D();
+    void end3D();
 private:
     Shader fragmentShader3D;
     Shader vertexShader3D;

@@ -13,8 +13,6 @@ namespace GL
 {
 class Mesh3D
 {
-friend class Graphics;
-
 public:
     Mesh3D();
     ~Mesh3D();

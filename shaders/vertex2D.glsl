@@ -14,4 +14,3 @@ void main()
 	ex_UV = in_UV;
 	gl_Position =  projectionMatrix * viewMatrix * modelMatrix * vec4(in_Position, 1.0);
 }
-

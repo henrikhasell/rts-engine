@@ -19,16 +19,18 @@ Graphics::Graphics(SDL_Window *window) :
 
     GLfloat aspectRatio = (GLfloat)w/(GLfloat)h;
 
-    matrixP3D = glm::perspective(45.0f, aspectRatio, 0.1f, 10.0f);
-
+    matrixP3D = glm::perspective(45.0f, aspectRatio, 1.0f, 500.0f);
+/*
     matrixV3D = glm::lookAt(
         glm::vec3(0.0, 3.0, 5.0),
         glm::vec3(0.0, 0.0, 0.0),
         glm::vec3(0.0, 1.0, 0.0)
     );
-
+*/
+    matrixV3D = glm::translate(matrixV3D, glm::vec3(0.0f,-25.0f, -200.0f));
+/*
     matrixV3D = glm::scale(matrixV3D, glm::vec3(0.03, 0.03, 0.03));
-
+*/
     matrixP2D = glm::ortho(0.0f, (GLfloat)w, (GLfloat)h, 0.0f);
 }
 
@@ -80,6 +82,7 @@ bool Graphics::initialise()
                             uniformV2D = glGetUniformLocation(program2D.program, "viewMatrix");
                             uniformM2D = glGetUniformLocation(program2D.program, "modelMatrix");
 
+                            glUniform1i(uniformTextureSampler2D, 0);
                             glUniformMatrix4fv(uniformP2D, 1, GL_FALSE, &matrixP2D[0][0]);
                             glUniformMatrix4fv(uniformV2D, 1, GL_FALSE, &matrixV2D[0][0]);
                             glUniformMatrix4fv(uniformM2D, 1, GL_FALSE, &matrixM2D[0][0]);
@@ -90,8 +93,8 @@ bool Graphics::initialise()
                             std::cout << "[2D] modelMatrix: " << uniformM3D << std::endl;
 
                             glEnable(GL_DEPTH_TEST);
-                            glEnable(GL_BLEND);
 
+                            glEnable(GL_BLEND);
                             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
                             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -131,3 +134,30 @@ bool Graphics::initialise()
 
     return false;
 }
+
+    void Graphics::begin2D()
+    {
+        glUseProgram(program2D.program);
+        glEnableVertexAttribArray(attributePosition2D);
+        glEnableVertexAttribArray(attributeUV2D);
+    }
+
+    void Graphics::begin3D()
+    {
+        glUseProgram(program3D.program);
+        glEnableVertexAttribArray(attributePosition3D);
+        glEnableVertexAttribArray(attributeNormal3D);
+    }
+
+    void Graphics::end2D()
+    {
+        glDisableVertexAttribArray(attributePosition2D);
+        glDisableVertexAttribArray(attributeUV2D);
+    }
+
+    void Graphics::end3D()
+    {
+        glDisableVertexAttribArray(attributePosition3D);
+        glDisableVertexAttribArray(attributeNormal3D);
+
+    }

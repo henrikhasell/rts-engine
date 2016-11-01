@@ -13,12 +13,12 @@ using namespace GL;
 
 Scene::Scene()
 {
-    //ctor
+
 }
 
 Scene::~Scene()
 {
-    //dtor
+
 }
 
 bool Scene::load(const char path[])

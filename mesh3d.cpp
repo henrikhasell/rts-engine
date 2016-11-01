@@ -1,4 +1,5 @@
 #include "mesh3d.hpp"
+#include <iostream>
 
 using namespace Engine;
 using namespace GL;
@@ -40,11 +41,6 @@ void Mesh3D::setIndices(const std::vector<GLuint> &indexArray)
 
 void Mesh3D::draw(const Graphics &graphics)
 {
-    glUseProgram(graphics.program3D.program);
-
-    glEnableVertexAttribArray(graphics.attributePosition3D);
-    glEnableVertexAttribArray(graphics.attributeNormal3D);
-
     glBindBuffer(GL_ARRAY_BUFFER, buffer[VERTEX_BUFFER]);
     glVertexAttribPointer(graphics.attributePosition3D, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
@@ -53,9 +49,6 @@ void Mesh3D::draw(const Graphics &graphics)
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[INDEX_BUFFER]);
     glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, (void*)0);
-
-    glDisableVertexAttribArray(graphics.attributePosition3D);
-    glDisableVertexAttribArray(graphics.attributeNormal3D);
 }
 
 #undef VERTEX_BUFFER

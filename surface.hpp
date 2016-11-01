@@ -5,6 +5,21 @@
 #include <GL/glew.h>
 #include <glm/vec2.hpp>
 #include "graphics.hpp"
+namespace Engine
+{
+namespace GL
+{
+class Surface
+{
+public:
+    Surface(SDL_Surface *surface);
+    Surface();
+    ~Surface();
+private:
+    SDL_Surface *surface;
+};
+};
+};
 /*
 namespace Engine
 {

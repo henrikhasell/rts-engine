@@ -12,7 +12,7 @@ class Program
 {
 friend class Graphics;
 friend class Mesh3D;
-friend class Surface;
+friend class Mesh2D;
 
 public:
     Program();

@@ -95,7 +95,7 @@ int main (void)
                                 std::cout << "Successfully loaded font." << std::endl;
                             }
 
-                            // Engine::GL::Surface surface = font.renderString("안녕하세요, 세계!");
+                            Engine::GL::TTF::Text text = font.renderString("안녕하세요, 세계!");
 
                             while(!finished)
                             {
@@ -120,8 +120,14 @@ int main (void)
                                     std::cerr << "An OpenGL eror has occured: " << error << std::endl;
                                 }
 
-                                scene.draw(graphics);
-                                // surface.draw(graphics);
+                                graphics.begin3D();
+                                    scene.draw(graphics);
+                                graphics.end3D();
+
+                                graphics.begin2D();
+                                    text.texture.bind();
+                                    text.mesh.draw(graphics);
+                                graphics.end2D();
 
                                 SDL_GL_SwapWindow(window);
                             }
