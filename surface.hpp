@@ -5,7 +5,7 @@
 #include <GL/glew.h>
 #include <glm/vec2.hpp>
 #include "graphics.hpp"
-
+/*
 namespace Engine
 {
 namespace GL
@@ -29,5 +29,5 @@ private:
 }; // Surface
 }; // GL
 }; // Engine
-
+*/
 #endif // SURFACE_HPP

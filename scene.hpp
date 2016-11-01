@@ -3,7 +3,7 @@
 
 #include <assimp/scene.h>
 #include "graphics.hpp"
-#include "mesh.hpp"
+#include "mesh3d.hpp"
 
 namespace Engine
 {
@@ -17,7 +17,7 @@ public:
     bool load(const char path[]);
     void draw(const Graphics &graphics);
 private:
-    std::vector<Mesh> mesh;
+    std::vector<Mesh3D> mesh;
 };
 };
 };

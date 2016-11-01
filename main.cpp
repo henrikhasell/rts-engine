@@ -95,7 +95,7 @@ int main (void)
                                 std::cout << "Successfully loaded font." << std::endl;
                             }
 
-                            Engine::GL::Surface surface = font.renderString("안녕하세요, 세계!");
+                            // Engine::GL::Surface surface = font.renderString("안녕하세요, 세계!");
 
                             while(!finished)
                             {
@@ -121,7 +121,7 @@ int main (void)
                                 }
 
                                 scene.draw(graphics);
-                                surface.draw(graphics);
+                                // surface.draw(graphics);
 
                                 SDL_GL_SwapWindow(window);
                             }

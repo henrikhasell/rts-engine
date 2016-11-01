@@ -19,7 +19,7 @@
 
 using namespace Engine;
 using namespace GL;
-
+/*
 static GLenum Texture_Format(const SDL_Surface *surface)
 {
 	if(surface->format->BytesPerPixel == 4)
@@ -53,13 +53,12 @@ static GLuint Texture_Upload(const SDL_Surface *surface)
 {
 	GLuint texture;
 	GLenum texture_format = Texture_Format(surface);
-/*
+
 // Black/white checkerboard
-float pixels[] = {
-0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
-1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
-};
-*/
+// float pixels[] = {
+// 0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
+// 1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
+// };
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -157,7 +156,7 @@ void Surface::draw(const Graphics &graphics)
     glDisableVertexAttribArray(graphics.attributePosition2D);
     glDisableVertexAttribArray(graphics.attributeUV2D);
 }
-
+*/
 #undef VERTEX_BUFFER
 #undef UV_BUFFER
 #undef INDEX_BUFFER

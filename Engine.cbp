@@ -47,8 +47,10 @@
 		<Unit filename="graphics.cpp" />
 		<Unit filename="graphics.hpp" />
 		<Unit filename="main.cpp" />
-		<Unit filename="mesh.cpp" />
-		<Unit filename="mesh.hpp" />
+		<Unit filename="mesh2d.cpp" />
+		<Unit filename="mesh2d.hpp" />
+		<Unit filename="mesh3d.cpp" />
+		<Unit filename="mesh3d.hpp" />
 		<Unit filename="models/cube.obj" />
 		<Unit filename="program.cpp" />
 		<Unit filename="program.hpp" />

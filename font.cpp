@@ -26,7 +26,7 @@ bool Font::load(const char path[])
 
     return font != nullptr;
 }
-
+/*
 Surface Font::renderString(const char string[])
 {
     SDL_Color white = {255, 255, 255};
@@ -40,3 +40,4 @@ Surface Font::renderString(const char string[])
 
     return Surface(surface);
 }
+*/

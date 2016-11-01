@@ -57,7 +57,7 @@ bool Scene::load(const char path[])
 
         this->mesh.emplace_back();
 
-        Mesh &newMesh = this->mesh.back();
+        Mesh3D &newMesh = this->mesh.back();
 
         newMesh.setVertices(vertexBuffer);
         newMesh.setNormals(normalBuffer);
@@ -71,7 +71,7 @@ bool Scene::load(const char path[])
 
 void Scene::draw(const Graphics &graphics)
 {
-    for(Mesh &mesh : this->mesh)
+    for(Mesh3D &mesh : this->mesh)
     {
         mesh.draw(graphics);
     }

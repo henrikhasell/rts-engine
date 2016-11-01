@@ -13,7 +13,7 @@ namespace GL
 {
 class Graphics
 {
-friend class Mesh;
+friend class Mesh3D;
 friend class Surface;
 
 public:
