@@ -9,6 +9,7 @@
 #include <assimp/scene.h>
 
 #include "graphics.hpp"
+#include "console.hpp"
 #include "mesh3d.hpp"
 #include "mesh2d.hpp"
 #include "scene.hpp"
@@ -105,16 +106,12 @@ int main (void)
                             SDL_StartTextInput();
 
                             Engine::GL::Mesh2D greetingText;
-
                             font.renderString(greetingText, "안녕하세요, 세계!");
 
                             lua_State *luaState = luaL_newstate();
                             luaL_openlibs(luaState);
 
-                            std::string consoleInputString = "";
-                            Engine::GL::Mesh2D consoleInputMesh;
-
-                            std::list<Engine::GL::Mesh2D> consoleOutput;
+                            Engine::GL::Console console;
 
                             while(!finished)
                             {
@@ -130,51 +127,17 @@ int main (void)
                                     {
                                         if(event.type == SDL_TEXTINPUT)
                                         {
-                                            if(consoleInputString.length() + strlen(event.text.text) < 256)
-                                            {
-                                                consoleInputString += event.text.text;
-                                                std::cout << "Input length: " << consoleInputString.length() << std::endl;
-                                                font.renderString(consoleInputMesh, consoleInputString.data());
-                                            }
+                                            console.appendInput(font, event.text.text);
                                         }
                                         else if(event.type == SDL_KEYDOWN)
                                         {
                                             if(event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
                                             {
-                                                if(consoleInputString.length() != 0)
-                                                {
-                                                    int last;
-
-                                                    do
-                                                    {
-                                                        last = consoleInputString.back() & 0x00C0;
-                                                        consoleInputString.pop_back();
-                                                    }
-                                                    while(last == 0x80);
-
-                                                    if(consoleInputString.length() > 0)
-                                                    {
-                                                        font.renderString(consoleInputMesh, consoleInputString.data());
-                                                    }
-
-
-                                                }
+                                                console.backspace(font);
                                             }
                                             if(event.key.keysym.scancode == SDL_SCANCODE_RETURN)
                                             {
-                                                if(consoleInputString.empty() != true)
-                                                {
-                                                    consoleOutput.emplace_back();
-
-                                                    font.renderString(consoleOutput.back(), consoleInputString.data());
-
-                                                    if(consoleOutput.size() > 20)
-                                                    {
-                                                        consoleOutput.pop_front();
-                                                    }
-
-                                                    consoleInputString.clear();
-                                                }
+                                                console.submitInput(font, luaState);
                                             }
                                         }
                                     }
@@ -193,20 +156,13 @@ int main (void)
 
                                 graphics.begin2D();
                                     greetingText.draw(graphics);
-                                    glm::vec2 offset(0.0f, 24.0f);
-                                    for(Engine::GL::Mesh2D &mesh : consoleOutput)
-                                    {
-                                        mesh.draw(graphics, offset);
-                                        offset.y += 24.0f;
-                                    }
-                                    if(consoleInputString.empty() == false)
-                                    {
-                                        consoleInputMesh.draw(graphics, offset);
-                                    }
+                                    console.draw(graphics);
                                 graphics.end2D();
 
                                 SDL_GL_SwapWindow(window);
                             }
+
+                            lua_close(luaState);
                         }
                         else
                         {

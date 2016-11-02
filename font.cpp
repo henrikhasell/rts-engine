@@ -26,7 +26,7 @@ bool Font::load(const char path[])
     return font != nullptr;
 }
 
-bool Font::renderString(Mesh2D &mesh, const char string[])
+bool Font::renderString(Mesh2D &mesh, const char string[]) const
 {
     SDL_Color white = {255, 255, 255};
 
