@@ -1,5 +1,7 @@
 #include "mesh2d.hpp"
 #include <iostream>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #define VERTEX_BUFFER 0
 #define INDEX_BUFFER 1
@@ -39,8 +41,12 @@ void Mesh2D::setIndices(const std::vector<GLuint> &indexArray)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArray.size() * sizeof(GLuint), indexArray.data(), GL_STATIC_DRAW);
 }
 
-void Mesh2D::draw(const Graphics &graphics)
+
+void Mesh2D::draw(const Graphics &graphics, const glm::vec2 &position)
 {
+    glm::mat4x4 transform = glm::translate(glm::mat4x4(1.0), glm::vec3(position, 0.0));
+    glUniformMatrix4fv(graphics.uniformM2D, 1, GL_FALSE, &transform[0][0]);
+
     texture.bind();
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[VERTEX_BUFFER]);
@@ -51,6 +57,11 @@ void Mesh2D::draw(const Graphics &graphics)
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[INDEX_BUFFER]);
     glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, (void*)0);
+}
+
+void Mesh2D::draw(const Graphics &graphics)
+{
+    draw(graphics, glm::vec2(0, 0));
 }
 
 void Mesh2D::setTexture(SDL_Surface *surface)

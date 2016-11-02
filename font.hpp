@@ -8,15 +8,6 @@ namespace Engine
 {
 namespace GL
 {
-namespace TTF
-{
-
-struct Text
-{
-    Texture texture;
-    Mesh2D mesh;
-};
-
 class Font
 {
     public:
@@ -26,8 +17,7 @@ class Font
         bool renderString(Mesh2D &mesh, const char string[]);
     private:
         TTF_Font *font;
-};
-}; // TTF
+}; // Font
 }; // GL
 }; // Engine
 

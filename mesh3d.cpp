@@ -1,5 +1,7 @@
 #include "mesh3d.hpp"
 #include <iostream>
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 using namespace Engine;
 using namespace GL;
@@ -39,8 +41,11 @@ void Mesh3D::setIndices(const std::vector<GLuint> &indexArray)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArray.size() * sizeof(GLuint), indexArray.data(), GL_STATIC_DRAW);
 }
 
-void Mesh3D::draw(const Graphics &graphics)
+void Mesh3D::draw(const Graphics &graphics, const glm::vec3 &position)
 {
+    glm::mat4x4 transform = glm::translate(glm::mat4x4(1.0), position);
+    glUniformMatrix4fv(graphics.uniformM3D, 1, GL_FALSE, &transform[0][0]);
+
     glBindBuffer(GL_ARRAY_BUFFER, buffer[VERTEX_BUFFER]);
     glVertexAttribPointer(graphics.attributePosition3D, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
@@ -49,6 +54,11 @@ void Mesh3D::draw(const Graphics &graphics)
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[INDEX_BUFFER]);
     glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, (void*)0);
+}
+
+void Mesh3D::draw(const Graphics &graphics)
+{
+    draw(graphics, glm::vec3(0.0, 0.0, 0.0));
 }
 
 #undef VERTEX_BUFFER

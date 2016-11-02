@@ -15,6 +15,7 @@ public:
     Scene();
     ~Scene();
     bool load(const char path[]);
+    void draw(const Graphics &graphics, const glm::vec3 &position);
     void draw(const Graphics &graphics);
 private:
     std::vector<Mesh3D> mesh;

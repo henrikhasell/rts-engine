@@ -7,11 +7,13 @@ using namespace GL;
 Texture::Texture()
 {
     glGenTextures(1, &texture);
+    std::cout << "Creating texture " << texture << " at address " << this << std::endl;
 }
 
 Texture::~Texture()
 {
     glDeleteTextures(1, &texture);
+    std::cout << "Destroying texture " << texture << " at address " << this << std::endl;
 }
 
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN

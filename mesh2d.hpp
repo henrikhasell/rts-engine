@@ -21,6 +21,7 @@ public:
     void setTextureCoordinates(const std::vector<glm::vec2> &uvArray);
     void setIndices(const std::vector<GLuint> &indexArray);
     void setTexture(SDL_Surface *surface);
+    void draw(const Graphics &graphics, const glm::vec2 &position);
     void draw(const Graphics &graphics);
 private:
     Texture texture;

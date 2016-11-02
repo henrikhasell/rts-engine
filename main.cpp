@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <list>
 #include <lua5.2/lua.hpp>
 
 #include <SDL2/SDL.h>
@@ -13,8 +15,8 @@
 #include "font.hpp"
 
 #define PROJECT_NAME "Shitty game engine."
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 800// 1280
+#define SCREEN_HEIGHT 600// 720
 
 int main (void)
 {
@@ -86,24 +88,28 @@ int main (void)
 
                             std::cout << "Successfully initialised the graphics sub-system." << std::endl;
 
-
                             Engine::GL::Scene scene;
-                            Engine::GL::TTF::Font font;
 
-                            scene.load("models/teapot.obj");
+                            if(scene.load("models/teapot.obj") == true)
+                            {
+                                std::cout << "Successfully loaded teapot." << std::endl;
+                            }
 
-                            if(font.load("fonts/NanumGothicCoding-Bold.ttf") == true)
+                            Engine::GL::Font font;
+
+                            if(font.load("fonts/NanumGothic-Bold.ttf") == true)
                             {
                                 std::cout << "Successfully loaded font." << std::endl;
                             }
 
                             SDL_StartTextInput();
 
-                            Engine::GL::Mesh2D text;
+                            Engine::GL::Mesh2D inputText, greetingText;
 
-                            font.renderString(text, "안녕하세요, 세계!");
+                            font.renderString(greetingText, "안녕하세요, 세계!");
 
-                            std::string line = "안녕하세요, 세계!";
+                            std::string consoleInput = "";
+                            std::list<Engine::GL::Mesh2D> consoleOutput;
 
                             while(!finished)
                             {
@@ -119,17 +125,17 @@ int main (void)
                                     {
                                         if(event.type == SDL_TEXTINPUT)
                                         {
-                                            if(line.length() < 100)
-                                            {
-                                                line += event.text.text;
-                                                font.renderString(text, line.empty() ? " " : line.data());
+                                            if(consoleInput.length() + strlen(event.text.text) < 20)
+                                            {// TODO: Extend arbitrary limit.
+                                                consoleInput += event.text.text;
+                                                font.renderString(inputText, consoleInput.empty() ? " " : consoleInput.data());
                                             }
                                         }
                                         else if(event.type == SDL_KEYDOWN)
                                         {
                                             if(event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
                                             {
-                                                if(line.length() > 0)
+                                                if(consoleInput.length() != 0)
                                                 {
                                                     /*
                                                     for(int last = 0x80; last == 0x80; last = line.back() & 0x00C0)
@@ -143,8 +149,8 @@ int main (void)
 
                                                     do
                                                     {
-                                                        last = line.back() & 0x00C0;
-                                                        line.pop_back();
+                                                        last = consoleInput.back() & 0x00C0;
+                                                        consoleInput.pop_back();
                                                     }
                                                     while(last == 0x80);
 
@@ -152,9 +158,21 @@ int main (void)
                                             }
                                             if(event.key.keysym.scancode == SDL_SCANCODE_RETURN)
                                             {
-                                                line.clear();
+                                                if(consoleInput.empty() == true)
+                                                {
+                                                    continue;
+                                                }
+                                                consoleOutput.emplace_back();
+                                                font.renderString(consoleOutput.back(), consoleInput.empty() ? " " : consoleInput.data());
+
+                                                if(consoleOutput.size() > 10)
+                                                {
+                                                    consoleOutput.pop_front();
+                                                }
+
+                                                consoleInput.clear();
                                             }
-                                            font.renderString(text, !line.length() ? " " : line.data());
+                                            font.renderString(inputText, consoleInput.empty() ? " " : consoleInput.data());
                                         }
                                     }
                                 }
@@ -168,10 +186,18 @@ int main (void)
 
                                 graphics.begin3D();
                                     scene.draw(graphics);
+                                    scene.draw(graphics, glm::vec3(0, 100, 0));
                                 graphics.end3D();
 
                                 graphics.begin2D();
-                                    text.draw(graphics);
+                                    greetingText.draw(graphics);
+                                    glm::vec2 offset(0.0f, 24.0f);
+                                    for(Engine::GL::Mesh2D &mesh : consoleOutput)
+                                    {
+                                        mesh.draw(graphics, offset);
+                                        offset.y += 24.0f;
+                                    }
+                                    inputText.draw(graphics, offset);
                                 graphics.end2D();
 
                                 SDL_GL_SwapWindow(window);

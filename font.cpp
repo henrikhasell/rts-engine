@@ -4,7 +4,6 @@
 
 using namespace Engine;
 using namespace GL;
-using namespace TTF;
 
 Font::Font() : font(nullptr)
 {

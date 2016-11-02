@@ -69,6 +69,14 @@ bool Scene::load(const char path[])
     return scene != nullptr;
 }
 
+void Scene::draw(const Graphics &graphics, const glm::vec3 &position)
+{
+    for(Mesh3D &mesh : this->mesh)
+    {
+        mesh.draw(graphics, position);
+    }
+}
+
 void Scene::draw(const Graphics &graphics)
 {
     for(Mesh3D &mesh : this->mesh)
