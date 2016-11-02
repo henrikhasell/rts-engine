@@ -104,11 +104,16 @@ int main (void)
 
                             SDL_StartTextInput();
 
-                            Engine::GL::Mesh2D inputText, greetingText;
+                            Engine::GL::Mesh2D greetingText;
 
                             font.renderString(greetingText, "안녕하세요, 세계!");
 
-                            std::string consoleInput = "";
+                            lua_State *luaState = luaL_newstate();
+                            luaL_openlibs(luaState);
+
+                            std::string consoleInputString = "";
+                            Engine::GL::Mesh2D consoleInputMesh;
+
                             std::list<Engine::GL::Mesh2D> consoleOutput;
 
                             while(!finished)
@@ -125,54 +130,52 @@ int main (void)
                                     {
                                         if(event.type == SDL_TEXTINPUT)
                                         {
-                                            if(consoleInput.length() + strlen(event.text.text) < 20)
-                                            {// TODO: Extend arbitrary limit.
-                                                consoleInput += event.text.text;
-                                                font.renderString(inputText, consoleInput.empty() ? " " : consoleInput.data());
+                                            if(consoleInputString.length() + strlen(event.text.text) < 256)
+                                            {
+                                                consoleInputString += event.text.text;
+                                                std::cout << "Input length: " << consoleInputString.length() << std::endl;
+                                                font.renderString(consoleInputMesh, consoleInputString.data());
                                             }
                                         }
                                         else if(event.type == SDL_KEYDOWN)
                                         {
                                             if(event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
                                             {
-                                                if(consoleInput.length() != 0)
+                                                if(consoleInputString.length() != 0)
                                                 {
-                                                    /*
-                                                    for(int last = 0x80; last == 0x80; last = line.back() & 0x00C0)
-                                                    {
-                                                        printf("%X\n", last);
-                                                        line.pop_back();
-                                                    }
-                                                    */
-
                                                     int last;
 
                                                     do
                                                     {
-                                                        last = consoleInput.back() & 0x00C0;
-                                                        consoleInput.pop_back();
+                                                        last = consoleInputString.back() & 0x00C0;
+                                                        consoleInputString.pop_back();
                                                     }
                                                     while(last == 0x80);
+
+                                                    if(consoleInputString.length() > 0)
+                                                    {
+                                                        font.renderString(consoleInputMesh, consoleInputString.data());
+                                                    }
+
 
                                                 }
                                             }
                                             if(event.key.keysym.scancode == SDL_SCANCODE_RETURN)
                                             {
-                                                if(consoleInput.empty() == true)
+                                                if(consoleInputString.empty() != true)
                                                 {
-                                                    continue;
-                                                }
-                                                consoleOutput.emplace_back();
-                                                font.renderString(consoleOutput.back(), consoleInput.empty() ? " " : consoleInput.data());
+                                                    consoleOutput.emplace_back();
 
-                                                if(consoleOutput.size() > 10)
-                                                {
-                                                    consoleOutput.pop_front();
-                                                }
+                                                    font.renderString(consoleOutput.back(), consoleInputString.data());
 
-                                                consoleInput.clear();
+                                                    if(consoleOutput.size() > 20)
+                                                    {
+                                                        consoleOutput.pop_front();
+                                                    }
+
+                                                    consoleInputString.clear();
+                                                }
                                             }
-                                            font.renderString(inputText, consoleInput.empty() ? " " : consoleInput.data());
                                         }
                                     }
                                 }
@@ -186,7 +189,6 @@ int main (void)
 
                                 graphics.begin3D();
                                     scene.draw(graphics);
-                                    scene.draw(graphics, glm::vec3(0, 100, 0));
                                 graphics.end3D();
 
                                 graphics.begin2D();
@@ -197,7 +199,10 @@ int main (void)
                                         mesh.draw(graphics, offset);
                                         offset.y += 24.0f;
                                     }
-                                    inputText.draw(graphics, offset);
+                                    if(consoleInputString.empty() == false)
+                                    {
+                                        consoleInputMesh.draw(graphics, offset);
+                                    }
                                 graphics.end2D();
 
                                 SDL_GL_SwapWindow(window);
