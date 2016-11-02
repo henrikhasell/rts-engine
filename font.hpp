@@ -4,6 +4,8 @@
 #include "mesh2d.hpp"
 #include <SDL2/SDL_ttf.h>
 
+#define FONT_SIZE 28
+
 namespace Engine
 {
 namespace GL
@@ -19,6 +21,7 @@ class Font
         TTF_Font *font;
 }; // Font
 }; // GL
+
 }; // Engine
 
 #endif // FONT_HPP

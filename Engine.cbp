@@ -42,8 +42,8 @@
 			<Add library="GL" />
 			<Add library="GLEW" />
 		</Linker>
-		<Unit filename="buffer.cpp" />
-		<Unit filename="buffer.hpp" />
+		<Unit filename="console.cpp" />
+		<Unit filename="console.hpp" />
 		<Unit filename="font.cpp" />
 		<Unit filename="font.hpp" />
 		<Unit filename="graphics.cpp" />

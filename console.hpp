@@ -2,7 +2,7 @@
 #define CONSOLE_HPP
 
 #include <list>
-#include <lua5.2/lua.h>
+#include <lua5.2/lua.hpp>
 #include "mesh2d.hpp"
 #include "font.hpp"
 
@@ -18,7 +18,7 @@ public:
 
     void appendOutput(const Font &font, const char output[]);
     void appendInput(const Font &font, const char input[]);
-    void submitInput(const Font &font, lua_State *state);
+    void submitInput(const Font &font, lua_State *luaState);
     void backspace(const Font &font);
     void draw(const Graphics &graphics);
 protected:

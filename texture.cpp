@@ -72,7 +72,7 @@ bool Texture::load(SDL_Surface *surface)
 #undef B_MASK
 #undef A_MASK
 
-void Texture::bind()
+void Texture::bind() const
 {
     glBindTexture(GL_TEXTURE_2D, texture);
 }

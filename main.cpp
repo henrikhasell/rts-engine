@@ -98,7 +98,7 @@ int main (void)
 
                             Engine::GL::Font font;
 
-                            if(font.load("fonts/NanumGothic-Bold.ttf") == true)
+                            if(font.load("fonts/NanumGothicCoding-Regular.ttf") == true)
                             {
                                 std::cout << "Successfully loaded font." << std::endl;
                             }
@@ -112,6 +112,70 @@ int main (void)
                             luaL_openlibs(luaState);
 
                             Engine::GL::Console console;
+
+                            Engine::GL::Mesh3D heightmap;
+
+                            // Dirty heightmap loading:
+                            SDL_Surface *heightmapSurface = SDL_LoadBMP("assets/heightmap.bmp");
+
+                            if(heightmapSurface)
+                            {
+                                SDL_Surface *optimisedSurface = SDL_CreateRGBSurface(0,
+                                    heightmapSurface->w, heightmapSurface->h, 24, 0, 0, 0, 0);
+
+                                if(optimisedSurface)
+                                {
+                                    SDL_BlitSurface(heightmapSurface, NULL, optimisedSurface, NULL);
+
+                                    std::vector<glm::vec3> vertexArray;
+                                    std::vector<glm::vec3> normalArray;
+                                    std::vector<GLuint> indexArray;
+
+                                    for(int y = 0; y < optimisedSurface->h; y++)
+                                    {
+                                        for(int x = 0; x < optimisedSurface->w; x++)
+                                        {
+                                            Uint8 *pixel = (Uint8*)heightmapSurface->pixels + (heightmapSurface->pitch * y) + (x * heightmapSurface->format->BytesPerPixel);
+                                            GLfloat height = (GLfloat)(pixel[0] + pixel[1] + pixel[2]) / 3.0f;
+                                            vertexArray.emplace_back((GLfloat)(x * 5), height, (GLfloat)(y * 5));
+                                            normalArray.emplace_back(0.0,-1.0f, 0.0);
+                                        }
+                                    }
+
+                                    for(int y = 0; y < optimisedSurface->h - 1; y++)
+                                    {
+                                        for(int x = 0; x < optimisedSurface->w - 1; x++)
+                                        {
+                                            GLuint index = y * optimisedSurface->w + x;
+
+                                            indexArray.emplace_back(index + 1);
+                                            indexArray.emplace_back(index);
+                                            indexArray.emplace_back(index + optimisedSurface->w);
+
+                                            indexArray.emplace_back(index + 1);
+                                            indexArray.emplace_back(index + optimisedSurface->w);
+                                            indexArray.emplace_back(index + optimisedSurface->w + 1);
+                                        }
+                                    }
+
+                                    heightmap.setVertices(vertexArray);
+                                    heightmap.setNormals(normalArray);
+                                    heightmap.setIndices(indexArray);
+
+                                    SDL_FreeSurface(optimisedSurface);
+                                }
+                                else
+                                {
+                                    std::cerr << "Failed to create optimised SDL surface." << std::endl;
+                                }
+
+                                SDL_FreeSurface(heightmapSurface);
+                            }
+                            else
+                            {
+                                std::cerr << "Failed to load assets/heightmap.bmp" << std::endl;
+                            }
+
 
                             while(!finished)
                             {
@@ -152,6 +216,7 @@ int main (void)
 
                                 graphics.begin3D();
                                     scene.draw(graphics);
+                                    heightmap.draw(graphics);
                                 graphics.end3D();
 
                                 graphics.begin2D();

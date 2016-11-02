@@ -14,7 +14,7 @@ class Texture
         Texture();
         ~Texture();
         bool load(SDL_Surface *surface);
-        void bind();
+        void bind() const;
     private:
         GLuint texture;
 }; // Texture

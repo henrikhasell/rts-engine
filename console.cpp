@@ -39,7 +39,7 @@ void Console::appendInput(const Font &font, const char input[])
     }
 }
 
-void Console::submitInput(const Font &font, lua_State *state)
+void Console::submitInput(const Font &font, lua_State *luaState)
 {
     // Check that there is something to submit:
     if(inputString.length() > 0)
@@ -47,7 +47,15 @@ void Console::submitInput(const Font &font, lua_State *state)
         // Append the input string to the output:
         appendOutput(font, inputString.data());
         // Pass the input string to Lua:
-        // TODO
+        int result = luaL_loadbuffer(luaState, inputString.data(), inputString.length(), "input") || lua_pcall(luaState, 0, 0, 0);
+        // Check for Lua errors:
+        if(result != 0)
+        {
+            // Get the error message from the top of the stack:
+            const char *errorMessage = lua_tostring(luaState, -1);
+            // Append the error message to the console's output:
+            appendOutput(font, errorMessage);
+        }
         // Clear the input string:
         inputString.clear();
     }
@@ -80,14 +88,14 @@ void Console::backspace(const Font &font)
 void Console::draw(const Graphics &graphics)
 {
     // Arbitrary offset:
-    glm::vec2 offset(0.0f, 24.0f);
+    glm::vec2 offset(0.0f, FONT_SIZE);
 
     for(Engine::GL::Mesh2D &mesh : outputMesh)
     {
         // Render one lone line of output:
         mesh.draw(graphics, offset);
         // Increment the offset by line height:
-        offset.y += 24.0f;
+        offset.y += FONT_SIZE;
     }
     // Check if the input string contains data:
     if(inputString.empty() == false)

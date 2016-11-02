@@ -20,7 +20,7 @@ bool Font::load(const char path[])
 
     if(file)
     {
-        font = TTF_OpenFontIndexRW(file, 1, 24, 0);
+        font = TTF_OpenFontIndexRW(file, 1, FONT_SIZE, 0);
     }
 
     return font != nullptr;
