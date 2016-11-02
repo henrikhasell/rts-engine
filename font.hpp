@@ -1,7 +1,6 @@
 #ifndef FONT_HPP
 #define FONT_HPP
 
-#include "texture.hpp"
 #include "mesh2d.hpp"
 #include <SDL2/SDL_ttf.h>
 
@@ -24,7 +23,7 @@ class Font
         Font();
         ~Font();
         bool load(const char path[]);
-        Text renderString(const char string[]);
+        bool renderString(Mesh2D &mesh, const char string[]);
     private:
         TTF_Font *font;
 };

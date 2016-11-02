@@ -41,6 +41,8 @@ void Mesh2D::setIndices(const std::vector<GLuint> &indexArray)
 
 void Mesh2D::draw(const Graphics &graphics)
 {
+    texture.bind();
+
     glBindBuffer(GL_ARRAY_BUFFER, buffer[VERTEX_BUFFER]);
     glVertexAttribPointer(graphics.attributePosition3D, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
@@ -49,6 +51,11 @@ void Mesh2D::draw(const Graphics &graphics)
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[INDEX_BUFFER]);
     glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, (void*)0);
+}
+
+void Mesh2D::setTexture(SDL_Surface *surface)
+{
+    texture.load(surface);
 }
 
 #undef VERTEX_BUFFER

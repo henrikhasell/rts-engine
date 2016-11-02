@@ -47,18 +47,18 @@ bool Graphics::initialise()
 
                 attributePosition3D = glGetAttribLocation(program3D.program, "in_Position");
                 attributeNormal3D = glGetAttribLocation(program3D.program, "in_Normal");
-
+/*
                 std::cout << "[3D] in_Position attribute location: " << attributePosition3D << std::endl;
                 std::cout << "[3D] in_Normal attribute location: " << attributeNormal3D << std::endl;
-
+*/
                 uniformP3D = glGetUniformLocation(program3D.program, "projectionMatrix");
                 uniformV3D = glGetUniformLocation(program3D.program, "viewMatrix");
                 uniformM3D = glGetUniformLocation(program3D.program, "modelMatrix");
-
+/*
                 std::cout << "[3D] projectionMatrix: " << uniformP3D << std::endl;
                 std::cout << "[3D] viewMatrix: " << uniformV3D << std::endl;
                 std::cout << "[3D] modelMatrix: " << uniformM3D << std::endl;
-
+*/
                 glUniformMatrix4fv(uniformP3D, 1, GL_FALSE, &matrixP3D[0][0]);
                 glUniformMatrix4fv(uniformV3D, 1, GL_FALSE, &matrixV3D[0][0]);
                 glUniformMatrix4fv(uniformM3D, 1, GL_FALSE, &matrixM3D[0][0]);
@@ -73,10 +73,10 @@ bool Graphics::initialise()
 
                             attributePosition2D = glGetAttribLocation(program2D.program, "in_Position");
                             attributeUV2D = glGetAttribLocation(program2D.program, "in_UV");
-
+/*
                             std::cout << "[2D] in_Position attribute location: " << attributePosition2D << std::endl;
                             std::cout << "[2D] in_UV attribute location: " << attributeUV2D << std::endl;
-
+*/
                             uniformTextureSampler2D = glGetUniformLocation(program2D.program, "textureSampler");
                             uniformP2D = glGetUniformLocation(program2D.program, "projectionMatrix");
                             uniformV2D = glGetUniformLocation(program2D.program, "viewMatrix");
@@ -86,12 +86,12 @@ bool Graphics::initialise()
                             glUniformMatrix4fv(uniformP2D, 1, GL_FALSE, &matrixP2D[0][0]);
                             glUniformMatrix4fv(uniformV2D, 1, GL_FALSE, &matrixV2D[0][0]);
                             glUniformMatrix4fv(uniformM2D, 1, GL_FALSE, &matrixM2D[0][0]);
-
+/*
                             std::cout << "[2D] textureSampler: " << uniformTextureSampler2D << std::endl;
                             std::cout << "[2D] projectionMatrix: " << uniformP3D << std::endl;
                             std::cout << "[2D] viewMatrix: " << uniformV3D << std::endl;
                             std::cout << "[2D] modelMatrix: " << uniformM3D << std::endl;
-
+*/
                             glEnable(GL_DEPTH_TEST);
 
                             glEnable(GL_BLEND);

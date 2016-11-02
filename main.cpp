@@ -7,7 +7,8 @@
 #include <assimp/scene.h>
 
 #include "graphics.hpp"
-#include "surface.hpp"
+#include "mesh3d.hpp"
+#include "mesh2d.hpp"
 #include "scene.hpp"
 #include "font.hpp"
 
@@ -85,6 +86,7 @@ int main (void)
 
                             std::cout << "Successfully initialised the graphics sub-system." << std::endl;
 
+
                             Engine::GL::Scene scene;
                             Engine::GL::TTF::Font font;
 
@@ -95,7 +97,13 @@ int main (void)
                                 std::cout << "Successfully loaded font." << std::endl;
                             }
 
-                            Engine::GL::TTF::Text text = font.renderString("안녕하세요, 세계!");
+                            SDL_StartTextInput();
+
+                            Engine::GL::Mesh2D text;
+
+                            font.renderString(text, "안녕하세요, 세계!");
+
+                            std::string line = "안녕하세요, 세계!";
 
                             while(!finished)
                             {
@@ -109,7 +117,45 @@ int main (void)
                                     }
                                     else
                                     {
-                                        // TODO: Add other events.
+                                        if(event.type == SDL_TEXTINPUT)
+                                        {
+                                            if(line.length() < 100)
+                                            {
+                                                line += event.text.text;
+                                                font.renderString(text, line.empty() ? " " : line.data());
+                                            }
+                                        }
+                                        else if(event.type == SDL_KEYDOWN)
+                                        {
+                                            if(event.key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
+                                            {
+                                                if(line.length() > 0)
+                                                {
+                                                    /*
+                                                    for(int last = 0x80; last == 0x80; last = line.back() & 0x00C0)
+                                                    {
+                                                        printf("%X\n", last);
+                                                        line.pop_back();
+                                                    }
+                                                    */
+
+                                                    int last;
+
+                                                    do
+                                                    {
+                                                        last = line.back() & 0x00C0;
+                                                        line.pop_back();
+                                                    }
+                                                    while(last == 0x80);
+
+                                                }
+                                            }
+                                            if(event.key.keysym.scancode == SDL_SCANCODE_RETURN)
+                                            {
+                                                line.clear();
+                                            }
+                                            font.renderString(text, !line.length() ? " " : line.data());
+                                        }
                                     }
                                 }
 
@@ -125,8 +171,7 @@ int main (void)
                                 graphics.end3D();
 
                                 graphics.begin2D();
-                                    text.texture.bind();
-                                    text.mesh.draw(graphics);
+                                    text.draw(graphics);
                                 graphics.end2D();
 
                                 SDL_GL_SwapWindow(window);
