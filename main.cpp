@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 
 #include "graphics.hpp"
+#include "heightmap.hpp"
 #include "console.hpp"
 #include "mesh3d.hpp"
 #include "mesh2d.hpp"
@@ -19,32 +20,10 @@
 #define PROJECT_NAME "Shitty game engine."
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
+#define TIME_STEP_LENGTH 1000/60
 
 int main (void)
 {
-/*
-    std::cout << "Initialising Lua..." << std::endl;
-
-    lua_State *luaState = luaL_newstate();
-    luaL_openlibs(luaState);
-
-    std::string input;
-
-    while(std::getline(std::cin, input))
-    {
-        int result = luaL_loadbuffer(luaState, input.c_str(), input.length(), "input") || lua_pcall(luaState, 0, 0, 0);
-
-        if (result != 0)
-        {
-            std::cerr << lua_tostring(luaState, -1) << std::endl;
-            lua_pop(luaState, 1);
-        }
-    }
-
-    std::cout << "Cleaning up..." << std::endl;
-
-    lua_close(luaState);
-*/
     if(SDL_Init(SDL_INIT_VIDEO) == 0)
     {
         std::cout << "Successfully initialised SDL2." << std::endl;
@@ -53,12 +32,16 @@ int main (void)
         {
             std::cout << "Successfully initialised SDL2_TTF." << std::endl;
 
+            SDL_DisplayMode displayMode;
+
+            SDL_GetDesktopDisplayMode(0, &displayMode);
+
             SDL_Window *window = SDL_CreateWindow(PROJECT_NAME,
                 SDL_WINDOWPOS_UNDEFINED,
                 SDL_WINDOWPOS_UNDEFINED,
-                SCREEN_WIDTH,
-                SCREEN_HEIGHT,
-                SDL_WINDOW_OPENGL
+                displayMode.w,
+                displayMode.h,
+                SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_INPUT_GRABBED
             );
 
             if(window != nullptr)
@@ -115,71 +98,18 @@ int main (void)
 
                             Engine::GL::Console console;
 
-                            Engine::GL::Mesh3D heightmap;
+                            Engine::GL::Heightmap heightmap;
 
-                            // Dirty heightmap loading:
-                            SDL_Surface *heightmapSurface = SDL_LoadBMP("assets/heightmap.bmp");
-
-                            if(heightmapSurface)
+                            if(heightmap.load("assets/heightmap.bmp") == true)
                             {
-                                SDL_Surface *optimisedSurface = SDL_CreateRGBSurface(0,
-                                    heightmapSurface->w, heightmapSurface->h, 24, 0, 0, 0, 0);
-
-                                if(optimisedSurface)
-                                {
-                                    SDL_BlitSurface(heightmapSurface, NULL, optimisedSurface, NULL);
-
-                                    std::vector<glm::vec3> vertexArray;
-                                    std::vector<GLuint> indexArray;
-
-                                    for(int y = 0; y < optimisedSurface->h; y++)
-                                    {
-                                        for(int x = 0; x < optimisedSurface->w; x++)
-                                        {
-                                            Uint8 *pixel = (Uint8*)heightmapSurface->pixels + (heightmapSurface->pitch * y) + (x * heightmapSurface->format->BytesPerPixel);
-                                            GLfloat height = (GLfloat)(pixel[0] + pixel[1] + pixel[2]) / 3.0f;
-                                            vertexArray.emplace_back(
-                                                (GLfloat)(x * 10), height,
-                                                (GLfloat)(y * 10)
-                                            );
-                                        }
-                                    }
-
-                                    for(int y = 0; y < optimisedSurface->h - 1; y++)
-                                    {
-                                        for(int x = 0; x < optimisedSurface->w - 1; x++)
-                                        {
-                                            GLuint index = y * optimisedSurface->w + x;
-
-                                            indexArray.emplace_back(index + 1);
-                                            indexArray.emplace_back(index);
-                                            indexArray.emplace_back(index + optimisedSurface->w);
-
-                                            indexArray.emplace_back(index + 1);
-                                            indexArray.emplace_back(index + optimisedSurface->w);
-                                            indexArray.emplace_back(index + optimisedSurface->w + 1);
-                                        }
-                                    }
-
-                                    heightmap.setVertices(vertexArray);
-                                    heightmap.setIndices(indexArray);
-                                    heightmap.calculateNormals();
-
-                                    SDL_FreeSurface(optimisedSurface);
-                                }
-                                else
-                                {
-                                    std::cerr << "Failed to create optimised SDL surface." << std::endl;
-                                }
-
-                                SDL_FreeSurface(heightmapSurface);
+                                heightmap.generateMesh();
                             }
                             else
                             {
-                                std::cerr << "Failed to load assets/heightmap.bmp" << std::endl;
+                                std::cerr << "Failed to load heightmap." << std::endl;
                             }
 
-                            Uint32 framesPerSecond = 0;
+                            Uint32 framesPerSecond = 0, timeStep = 0;
 
                             while(!finished)
                             {
@@ -213,6 +143,11 @@ int main (void)
                                     }
                                 }
 
+                                while(timeStep > TIME_STEP_LENGTH)
+                                {
+                                    timeStep -= TIME_STEP_LENGTH;
+                                }
+
                                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                                 for(int error = glGetError(); error != GL_NO_ERROR; error = glGetError())
@@ -236,7 +171,8 @@ int main (void)
                                 SDL_GL_SwapWindow(window);
 
                                 frameTime = SDL_GetTicks() - frameTime;
-                                framesPerSecond = frameTime ? 1000 / frameTime : 1000;
+                                framesPerSecond = frameTime ? (1000 / frameTime) : 1000;
+                                timeStep += frameTime;
                             }
 
                             lua_close(luaState);

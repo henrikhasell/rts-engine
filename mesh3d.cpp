@@ -41,7 +41,7 @@ void Mesh3D::setIndices(const std::vector<GLuint> &indexArray)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArray.size() * sizeof(GLuint), indexArray.data(), GL_STATIC_DRAW);
 }
 
-void Mesh3D::draw(const Graphics &graphics, const glm::vec3 &position)
+void Mesh3D::draw(const Graphics &graphics, const glm::vec3 &position) const
 {
     glm::mat4x4 transform = glm::translate(glm::mat4x4(1.0), position);
     glUniformMatrix4fv(graphics.uniformM3D, 1, GL_FALSE, &transform[0][0]);
@@ -56,7 +56,7 @@ void Mesh3D::draw(const Graphics &graphics, const glm::vec3 &position)
     glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, (void*)0);
 }
 
-void Mesh3D::draw(const Graphics &graphics)
+void Mesh3D::draw(const Graphics &graphics) const
 {
     draw(graphics, glm::vec3(0.0, 0.0, 0.0));
 }
