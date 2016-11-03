@@ -61,6 +61,16 @@ void Mesh3D::draw(const Graphics &graphics)
     draw(graphics, glm::vec3(0.0, 0.0, 0.0));
 }
 
+void Mesh3D::calculateNormals()
+{
+    if(normalArray.size() > 0)
+    {
+        // Normals already exist.
+        // Do not continue.
+        return;
+    }
+}
+
 #undef VERTEX_BUFFER
 #undef NORMAL_BUFFER
 #undef INDEX_BUFFER

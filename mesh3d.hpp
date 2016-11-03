@@ -21,6 +21,7 @@ public:
     void setIndices(const std::vector<GLuint> &indexArray);
     void draw(const Graphics &graphics, const glm::vec3 &position);
     void draw(const Graphics &graphics);
+    void calculateNormals();
 private:
     std::vector<glm::vec3> vertexArray;
     std::vector<glm::vec3> normalArray;

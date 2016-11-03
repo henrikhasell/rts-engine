@@ -7,6 +7,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <GL/glew.h>
 #include <assimp/scene.h>
+#include <glm/glm.hpp>
 
 #include "graphics.hpp"
 #include "console.hpp"
@@ -138,7 +139,6 @@ int main (void)
                                             Uint8 *pixel = (Uint8*)heightmapSurface->pixels + (heightmapSurface->pitch * y) + (x * heightmapSurface->format->BytesPerPixel);
                                             GLfloat height = (GLfloat)(pixel[0] + pixel[1] + pixel[2]) / 3.0f;
                                             vertexArray.emplace_back((GLfloat)(x * 5), height, (GLfloat)(y * 5));
-                                            normalArray.emplace_back(0.0,-1.0f, 0.0);
                                         }
                                     }
 
@@ -155,6 +155,21 @@ int main (void)
                                             indexArray.emplace_back(index + 1);
                                             indexArray.emplace_back(index + optimisedSurface->w);
                                             indexArray.emplace_back(index + optimisedSurface->w + 1);
+
+                                            glm::vec3 &t1 = vertexArray[index + 1];
+                                            glm::vec3 &t2 = vertexArray[index];
+                                            glm::vec3 &t3 = vertexArray[index + optimisedSurface->w];
+                                            glm::vec3 &t4 = vertexArray[index + optimisedSurface->w + 1];
+
+                                            glm::vec3 v1 = t2 - t1;
+                                            glm::vec3 v2 = t3 - t1;
+                                            glm::vec3 v3 = t4 - t1;
+
+                                            const glm::vec3 n1 = glm::normalize(glm::cross(v1, v2));
+                                            const glm::vec3 n2 = glm::normalize(glm::cross(v1, v3));
+
+                                            normalArray.push_back(-n1);
+                                            normalArray.push_back(-n2);
                                         }
                                     }
 

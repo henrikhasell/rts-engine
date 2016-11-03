@@ -31,7 +31,7 @@ Graphics::Graphics(SDL_Window *window) :
 
     matrixV3D = glm::scale(matrixV3D, glm::vec3(0.03, 0.03, 0.03));
 */
-    matrixV3D = glm::lookAt(glm::vec3(0.0f, 100.0f, 0.0f), glm::vec3(200.0f, 0.0f, 200.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    matrixV3D = glm::lookAt(glm::vec3(-200.0f, 600.0f, -200.0f), glm::vec3(200.0f, 0.0f, 200.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     matrixP2D = glm::ortho(0.0f, (GLfloat)w, (GLfloat)h, 0.0f);
 }
 
@@ -94,10 +94,10 @@ bool Graphics::initialise()
 */
                             glEnable(GL_DEPTH_TEST);
 
-                            glEnable(GL_BLEND);
-                            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                            // glEnable(GL_BLEND);
+                            // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-                            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                            // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
                             return true;
