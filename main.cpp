@@ -107,6 +107,7 @@ int main (void)
                             SDL_StartTextInput();
 
                             Engine::GL::Mesh2D greetingText;
+                            Engine::GL::Mesh2D framesPerSecondMesh;
                             font.renderString(greetingText, "안녕하세요, 세계!");
 
                             lua_State *luaState = luaL_newstate();
@@ -138,8 +139,8 @@ int main (void)
                                             Uint8 *pixel = (Uint8*)heightmapSurface->pixels + (heightmapSurface->pitch * y) + (x * heightmapSurface->format->BytesPerPixel);
                                             GLfloat height = (GLfloat)(pixel[0] + pixel[1] + pixel[2]) / 3.0f;
                                             vertexArray.emplace_back(
-                                                (GLfloat)(x * 5), height,
-                                                (GLfloat)(y * 5)
+                                                (GLfloat)(x * 10), height,
+                                                (GLfloat)(y * 10)
                                             );
                                         }
                                     }
@@ -178,9 +179,13 @@ int main (void)
                                 std::cerr << "Failed to load assets/heightmap.bmp" << std::endl;
                             }
 
+                            Uint32 framesPerSecond = 0;
+
                             while(!finished)
                             {
                                 SDL_Event event;
+
+                                Uint32 frameTime = SDL_GetTicks();
 
                                 while(SDL_PollEvent(&event) != 0)
                                 {
@@ -222,10 +227,16 @@ int main (void)
 
                                 graphics.begin2D();
                                     greetingText.draw(graphics);
+                                    framesPerSecondMesh.draw(graphics, glm::vec2(0.0f, FONT_SIZE * 1.0f));
                                     console.draw(graphics);
                                 graphics.end2D();
 
+                                font.renderString(framesPerSecondMesh, std::to_string(framesPerSecond).data());
+
                                 SDL_GL_SwapWindow(window);
+
+                                frameTime = SDL_GetTicks() - frameTime;
+                                framesPerSecond = frameTime ? 1000 / frameTime : 1000;
                             }
 
                             lua_close(luaState);

@@ -19,13 +19,13 @@ Graphics::Graphics(SDL_Window *window) :
 
     GLfloat aspectRatio = (GLfloat)w/(GLfloat)h;
 
-    matrixP3D = glm::perspective(45.0f, aspectRatio, 1.0f, 2000.0f);
+    matrixP3D = glm::perspective(45.0f, aspectRatio, 1.0f, 10000.0f);
 
     matrixP2D = glm::ortho(0.0f, (GLfloat)w, (GLfloat)h, 0.0f);
 
     matrixV3D = glm::lookAt(
-        glm::vec3(200.0f, 800.0f, 200.0f),
-        glm::vec3(500.0f, 0.0f, 500.0f),
+        glm::vec3(1000.0f, 1000.0f, 1000.0f),
+        glm::vec3(400.0f, 0.0f, 1000.0f),
         glm::vec3(0.0f, 1.0f, 0.0f)
     );
 }

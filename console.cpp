@@ -88,7 +88,7 @@ void Console::backspace(const Font &font)
 void Console::draw(const Graphics &graphics)
 {
     // Arbitrary offset:
-    glm::vec2 offset(0.0f, FONT_SIZE);
+    glm::vec2 offset(0.0f, FONT_SIZE * 2.0f);
 
     for(Engine::GL::Mesh2D &mesh : outputMesh)
     {
