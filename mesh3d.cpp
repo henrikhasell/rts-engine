@@ -63,12 +63,35 @@ void Mesh3D::draw(const Graphics &graphics)
 
 void Mesh3D::calculateNormals()
 {
-    if(normalArray.size() > 0)
+    normalArray.clear();
+    normalArray.resize(vertexArray.size());
+
+    for(size_t i = 0; i < indexArray.size(); i += 3)
     {
-        // Normals already exist.
-        // Do not continue.
-        return;
+        const GLuint indexA = indexArray[i + 0];
+        const GLuint indexB = indexArray[i + 1];
+        const GLuint indexC = indexArray[i + 2];
+
+        const glm::vec3 &t0 = vertexArray[indexA];
+        const glm::vec3 &t1 = vertexArray[indexB];
+        const glm::vec3 &t2 = vertexArray[indexC];
+
+        const glm::vec3 v1 = t0 - t1;
+        const glm::vec3 v2 = t0 - t2;
+
+        const glm::vec3 &normal = glm::normalize(glm::cross(v1, v2));
+
+        normalArray[indexA] += normal;
+        normalArray[indexB] += normal;
+        normalArray[indexC] += normal;
     }
+
+    for(glm::vec3 &normal : normalArray)
+    {
+        normal = glm::normalize(normal);
+    }
+
+    setNormals(normalArray);
 }
 
 #undef VERTEX_BUFFER

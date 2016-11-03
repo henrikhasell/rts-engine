@@ -19,20 +19,15 @@ Graphics::Graphics(SDL_Window *window) :
 
     GLfloat aspectRatio = (GLfloat)w/(GLfloat)h;
 
-    matrixP3D = glm::perspective(45.0f, aspectRatio, 1.0f, 5000.0f);
-/*
-    matrixV3D = glm::lookAt(
-        glm::vec3(0.0, 3.0, 5.0),
-        glm::vec3(0.0, 0.0, 0.0),
-        glm::vec3(0.0, 1.0, 0.0)
-    );
+    matrixP3D = glm::perspective(45.0f, aspectRatio, 1.0f, 2000.0f);
 
-    matrixV3D = glm::translate(matrixV3D, glm::vec3(0.0f,-25.0f, -200.0f));
-
-    matrixV3D = glm::scale(matrixV3D, glm::vec3(0.03, 0.03, 0.03));
-*/
-    matrixV3D = glm::lookAt(glm::vec3(-200.0f, 600.0f, -200.0f), glm::vec3(200.0f, 0.0f, 200.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     matrixP2D = glm::ortho(0.0f, (GLfloat)w, (GLfloat)h, 0.0f);
+
+    matrixV3D = glm::lookAt(
+        glm::vec3(200.0f, 800.0f, 200.0f),
+        glm::vec3(500.0f, 0.0f, 500.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f)
+    );
 }
 
 bool Graphics::initialise()
@@ -93,12 +88,14 @@ bool Graphics::initialise()
                             std::cout << "[2D] modelMatrix: " << uniformM3D << std::endl;
 */
                             glEnable(GL_DEPTH_TEST);
+                            glEnable(GL_CULL_FACE);
 
-                            // glEnable(GL_BLEND);
-                            // glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                            glEnable(GL_BLEND);
+                            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
                             // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                             glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+                            // glFrontFace(GL_CW);
 
                             return true;
 

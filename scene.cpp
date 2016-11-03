@@ -23,7 +23,12 @@ Scene::~Scene()
 
 bool Scene::load(const char path[])
 {
-    const aiScene *scene = aiImportFile(path, aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+    const aiScene *scene = aiImportFile(path,
+        aiProcess_JoinIdenticalVertices
+        | aiProcess_Triangulate
+        | aiProcess_GenSmoothNormals
+        | aiProcess_FlipWindingOrder
+    );
 
     for(unsigned int i = 0; i < scene->mNumMeshes; i++)
     {

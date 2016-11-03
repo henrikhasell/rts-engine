@@ -17,8 +17,8 @@
 #include "font.hpp"
 
 #define PROJECT_NAME "Shitty game engine."
-#define SCREEN_WIDTH 800// 1280
-#define SCREEN_HEIGHT 600// 720
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
 
 int main (void)
 {
@@ -94,12 +94,12 @@ int main (void)
 
                             if(scene.load("models/teapot.obj") == true)
                             {
-                                std::cout << "Successfully loaded teapot." << std::endl;
+                                std::cout << "Successfully loaded model." << std::endl;
                             }
 
                             Engine::GL::Font font;
 
-                            if(font.load("fonts/NanumGothicCoding-Regular.ttf") == true)
+                            if(font.load("fonts/NanumGothicCoding-Bold.ttf") == true)
                             {
                                 std::cout << "Successfully loaded font." << std::endl;
                             }
@@ -129,7 +129,6 @@ int main (void)
                                     SDL_BlitSurface(heightmapSurface, NULL, optimisedSurface, NULL);
 
                                     std::vector<glm::vec3> vertexArray;
-                                    std::vector<glm::vec3> normalArray;
                                     std::vector<GLuint> indexArray;
 
                                     for(int y = 0; y < optimisedSurface->h; y++)
@@ -138,7 +137,10 @@ int main (void)
                                         {
                                             Uint8 *pixel = (Uint8*)heightmapSurface->pixels + (heightmapSurface->pitch * y) + (x * heightmapSurface->format->BytesPerPixel);
                                             GLfloat height = (GLfloat)(pixel[0] + pixel[1] + pixel[2]) / 3.0f;
-                                            vertexArray.emplace_back((GLfloat)(x * 5), height, (GLfloat)(y * 5));
+                                            vertexArray.emplace_back(
+                                                (GLfloat)(x * 5), height,
+                                                (GLfloat)(y * 5)
+                                            );
                                         }
                                     }
 
@@ -155,27 +157,12 @@ int main (void)
                                             indexArray.emplace_back(index + 1);
                                             indexArray.emplace_back(index + optimisedSurface->w);
                                             indexArray.emplace_back(index + optimisedSurface->w + 1);
-
-                                            glm::vec3 &t1 = vertexArray[index + 1];
-                                            glm::vec3 &t2 = vertexArray[index];
-                                            glm::vec3 &t3 = vertexArray[index + optimisedSurface->w];
-                                            glm::vec3 &t4 = vertexArray[index + optimisedSurface->w + 1];
-
-                                            glm::vec3 v1 = t2 - t1;
-                                            glm::vec3 v2 = t3 - t1;
-                                            glm::vec3 v3 = t4 - t1;
-
-                                            const glm::vec3 n1 = glm::normalize(glm::cross(v1, v2));
-                                            const glm::vec3 n2 = glm::normalize(glm::cross(v1, v3));
-
-                                            normalArray.push_back(-n1);
-                                            normalArray.push_back(-n2);
                                         }
                                     }
 
                                     heightmap.setVertices(vertexArray);
-                                    heightmap.setNormals(normalArray);
                                     heightmap.setIndices(indexArray);
+                                    heightmap.calculateNormals();
 
                                     SDL_FreeSurface(optimisedSurface);
                                 }
@@ -190,7 +177,6 @@ int main (void)
                             {
                                 std::cerr << "Failed to load assets/heightmap.bmp" << std::endl;
                             }
-
 
                             while(!finished)
                             {
