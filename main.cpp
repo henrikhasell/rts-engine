@@ -12,6 +12,7 @@
 #include "graphics.hpp"
 #include "heightmap.hpp"
 #include "console.hpp"
+#include "camera.hpp"
 #include "mesh3d.hpp"
 #include "mesh2d.hpp"
 #include "scene.hpp"
@@ -89,9 +90,12 @@ int main (void)
 
                             SDL_StartTextInput();
 
+                            Engine::GL::Camera camera;
+
                             Engine::GL::Mesh2D greetingText;
-                            Engine::GL::Mesh2D framesPerSecondMesh;
                             font.renderString(greetingText, "안녕하세요, 세계!");
+
+                            Engine::GL::Mesh2D framesPerSecondMesh;
 
                             lua_State *luaState = luaL_newstate();
                             luaL_openlibs(luaState);
@@ -146,6 +150,17 @@ int main (void)
                                 while(timeStep > TIME_STEP_LENGTH)
                                 {
                                     timeStep -= TIME_STEP_LENGTH;
+
+                                    const Uint8 *keyState = SDL_GetKeyboardState(nullptr);
+
+                                    if(keyState[SDL_SCANCODE_UP])
+                                        camera.panForward();
+                                    if(keyState[SDL_SCANCODE_DOWN])
+                                        camera.panBackward();
+                                    if(keyState[SDL_SCANCODE_LEFT])
+                                        camera.panLeft();
+                                    if(keyState[SDL_SCANCODE_RIGHT])
+                                        camera.panRight();
                                 }
 
                                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -156,6 +171,7 @@ int main (void)
                                 }
 
                                 graphics.begin3D();
+                                    camera.setView(graphics);
                                     scene.draw(graphics);
                                     heightmap.draw(graphics);
                                 graphics.end3D();
