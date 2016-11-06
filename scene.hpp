@@ -15,10 +15,12 @@ public:
     Scene();
     ~Scene();
     bool load(const char path[]);
-    void draw(const Graphics &graphics, const glm::vec3 &position);
-    void draw(const Graphics &graphics);
+    void createMesh(Mesh3D &mesh);
+    void createCollisionMesh();
 private:
-    std::vector<Mesh3D> mesh;
+    std::vector<glm::vec3> vertexBuffer;
+    std::vector<glm::vec3> normalBuffer;
+    std::vector<GLuint> indexBuffer;
 };
 };
 };

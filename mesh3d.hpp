@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <glm/vec3.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <GL/glew.h>
 
 #include "graphics.hpp"
@@ -20,6 +21,7 @@ public:
     void setVertices(const std::vector<glm::vec3> &vertexArray);
     void setNormals(const std::vector<glm::vec3> &normalArray);
     void setIndices(const std::vector<GLuint> &indexArray);
+    void draw(const Graphics &graphics, const glm::vec3 &position, const glm::quat &rotation) const;
     void draw(const Graphics &graphics, const glm::vec3 &position) const;
     void draw(const Graphics &graphics) const;
     void calculateNormals();

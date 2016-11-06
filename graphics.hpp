@@ -16,6 +16,7 @@ class Graphics
 friend class Mesh3D;
 friend class Mesh2D;
 friend class Texture;
+friend class Camera;
 
 public:
     Graphics(SDL_Window *window);
@@ -24,6 +25,7 @@ public:
     void begin3D();
     void end2D();
     void end3D();
+    void translate3D(const glm::vec3 &position);
 private:
     Shader fragmentShader3D;
     Shader vertexShader3D;

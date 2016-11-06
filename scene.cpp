@@ -2,10 +2,12 @@
 
 #include <iostream>
 
-#include <assimp/cimport.h>
+#include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
-#include <assimp/mesh.h>
 #include <assimp/vector3.h>
+#include <assimp/scene.h>
+#include <assimp/mesh.h>
+
 #include <glm/vec4.hpp>
 
 using namespace Engine;
@@ -23,20 +25,21 @@ Scene::~Scene()
 
 bool Scene::load(const char path[])
 {
-    const aiScene *scene = aiImportFile(path,
-        aiProcess_JoinIdenticalVertices
-        | aiProcess_Triangulate
-        | aiProcess_GenSmoothNormals
-        | aiProcess_FlipWindingOrder
-    );
+    Assimp::Importer importer;
+
+    const aiScene *scene = importer.ReadFile(path,
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_Triangulate           |
+        aiProcess_GenSmoothNormals      |
+        aiProcess_FlipWindingOrder      );
+
+    vertexBuffer.clear();
+    normalBuffer.clear();
+    indexBuffer.clear();
 
     for(unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[i];
-
-        std::vector<glm::vec3> vertexBuffer;
-        std::vector<glm::vec3> normalBuffer;
-        std::vector<GLuint> indexBuffer;
 
         for(unsigned int j = 0; j < mesh->mNumFaces; j++)
         {
@@ -60,32 +63,15 @@ bool Scene::load(const char path[])
             normalBuffer.push_back(normal);
         }
 
-        this->mesh.emplace_back();
-
-        Mesh3D &newMesh = this->mesh.back();
-
-        newMesh.setVertices(vertexBuffer);
-        newMesh.setNormals(normalBuffer);
-        newMesh.setIndices(indexBuffer);
     }
-
-    aiReleaseImport(scene);
 
     return scene != nullptr;
 }
 
-void Scene::draw(const Graphics &graphics, const glm::vec3 &position)
+void Scene::createMesh(Mesh3D &mesh)
 {
-    for(Mesh3D &mesh : this->mesh)
-    {
-        mesh.draw(graphics, position);
-    }
+    mesh.setVertices(vertexBuffer);
+    mesh.setNormals(normalBuffer);
+    mesh.setIndices(indexBuffer);
 }
 
-void Scene::draw(const Graphics &graphics)
-{
-    for(Mesh3D &mesh : this->mesh)
-    {
-        mesh.draw(graphics);
-    }
-}

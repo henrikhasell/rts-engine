@@ -8,6 +8,7 @@
 #include <GL/glew.h>
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
+#include <btBulletDynamicsCommon.h>
 
 #include "graphics.hpp"
 #include "heightmap.hpp"
@@ -74,26 +75,33 @@ int main (void)
 
                             std::cout << "Successfully initialised the graphics sub-system." << std::endl;
 
-                            Engine::GL::Scene scene;
 
-                            if(scene.load("models/teapot.obj") == true)
-                            {
-                                std::cout << "Successfully loaded model." << std::endl;
-                            }
+                            Engine::GL::Mesh3D teapotMesh;
+                            Engine::GL::Mesh3D cubeMesh;
+                            Engine::GL::Mesh3D sphereMesh;
+
+                            Engine::GL::Scene teapotScene;
+                            teapotScene.load("models/teapot.obj");
+
+                            Engine::GL::Scene sphereScene;
+                            sphereScene.load("models/sphere.obj");
+
+                            Engine::GL::Scene cubeScene;
+                            cubeScene.load("models/bigCube.obj");
 
                             Engine::GL::Font font;
+                            font.load("fonts/NanumGothicCoding-Bold.ttf");
 
-                            if(font.load("fonts/NanumGothicCoding-Bold.ttf") == true)
-                            {
-                                std::cout << "Successfully loaded font." << std::endl;
-                            }
+                            Engine::GL::Mesh2D greetingText;
+                            font.renderString(greetingText, "안녕하세요, 세계!");
+
+                            teapotScene.createMesh(teapotMesh);
+                            sphereScene.createMesh(sphereMesh);
+                            cubeScene.createMesh(cubeMesh);
 
                             SDL_StartTextInput();
 
                             Engine::GL::Camera camera;
-
-                            Engine::GL::Mesh2D greetingText;
-                            font.renderString(greetingText, "안녕하세요, 세계!");
 
                             Engine::GL::Mesh2D framesPerSecondMesh;
 
@@ -104,7 +112,7 @@ int main (void)
 
                             Engine::GL::Heightmap heightmap;
 
-                            if(heightmap.load("assets/heightmap.bmp") == true)
+                            if(heightmap.load("assets/heightmap3.bmp") == true)
                             {
                                 heightmap.generateMesh();
                             }
@@ -112,6 +120,55 @@ int main (void)
                             {
                                 std::cerr << "Failed to load heightmap." << std::endl;
                             }
+
+                            btBroadphaseInterface* broadphase = new btDbvtBroadphase();
+                            btDefaultCollisionConfiguration* collisionConfiguration = new btDefaultCollisionConfiguration();
+                            btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
+                            btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
+                            btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+
+                            dynamicsWorld->setGravity(btVector3(0.0f, -10.0f, 0.0f));
+
+
+                            btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 1);
+                            btCollisionShape* fallShape =
+                            /*
+                                new btBoxShape(
+                                    btVector3(10.0f, 10.0f, 10.0f)
+                                );
+                            */
+                                new btSphereShape(
+                                    12.5f
+                                );
+
+                            btDefaultMotionState* fallMotionState =
+                                new btDefaultMotionState(
+                                    btTransform(
+                                        btQuaternion(0, 0, 0, 1),
+                                        btVector3(400, 300, 400)
+                                    )
+                                );
+
+                            btScalar mass = 1;
+                            btVector3 fallInertia(0, 0, 0);
+                            fallShape->calculateLocalInertia(mass, fallInertia);
+                            btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(mass, fallMotionState, fallShape, fallInertia);
+                            btRigidBody* fallRigidBody = new btRigidBody(fallRigidBodyCI);
+                            dynamicsWorld->addRigidBody(fallRigidBody);
+
+                            btRigidBody::btRigidBodyConstructionInfo heightmapInfo(
+                                0.0f,
+                                new btDefaultMotionState(
+                                    btTransform(
+                                        btQuaternion(0, 0, 0, 1),
+                                        btVector3(0, 10, 0)
+                                    )
+                                ),
+                                heightmap.generateCollisionMesh(),
+                                btVector3()
+                            );
+                            btRigidBody* heightmapBody = new btRigidBody(heightmapInfo);
+                            dynamicsWorld->addRigidBody(heightmapBody);
 
                             Uint32 framesPerSecond = 0, timeStep = 0;
 
@@ -161,6 +218,11 @@ int main (void)
                                         camera.panLeft();
                                     if(keyState[SDL_SCANCODE_RIGHT])
                                         camera.panRight();
+
+                                    btTransform trans;
+                                    dynamicsWorld->stepSimulation(0.1f, 10);
+                                    fallRigidBody->getMotionState()->getWorldTransform(trans);
+
                                 }
 
                                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -171,8 +233,24 @@ int main (void)
                                 }
 
                                 graphics.begin3D();
-                                    camera.setView(graphics);
-                                    scene.draw(graphics);
+                                    camera.applyView(graphics);
+
+                                    btTransform transform;
+                                    fallRigidBody->getMotionState()->getWorldTransform(transform);
+                                    glm::vec3 translate(
+                                        transform.getOrigin().getX(),
+                                        transform.getOrigin().getY(),
+                                        transform.getOrigin().getZ()
+                                    );
+                                    glm::quat rotate(
+                                        transform.getRotation().getW(),
+                                        transform.getRotation().getX(),
+                                        transform.getRotation().getY(),
+                                        transform.getRotation().getZ()
+                                    );
+                                    sphereMesh.draw(graphics, translate, rotate);
+
+                                    teapotMesh.draw(graphics, glm::vec3(200, 200, 200));
                                     heightmap.draw(graphics);
                                 graphics.end3D();
 
@@ -190,6 +268,21 @@ int main (void)
                                 framesPerSecond = frameTime ? (1000 / frameTime) : 1000;
                                 timeStep += frameTime;
                             }
+
+                            dynamicsWorld->removeRigidBody(fallRigidBody);
+                            delete fallRigidBody->getMotionState();
+                            delete fallRigidBody;
+
+                            delete fallShape;
+
+                            delete groundShape;
+
+
+                            delete dynamicsWorld;
+                            delete solver;
+                            delete collisionConfiguration;
+                            delete dispatcher;
+                            delete broadphase;
 
                             lua_close(luaState);
                         }

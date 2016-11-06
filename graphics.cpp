@@ -133,29 +133,36 @@ bool Graphics::initialise()
     return false;
 }
 
-    void Graphics::begin2D()
-    {
-        glUseProgram(program2D.program);
-        glEnableVertexAttribArray(attributePosition2D);
-        glEnableVertexAttribArray(attributeUV2D);
-    }
+void Graphics::begin2D()
+{
+    glUseProgram(program2D.program);
+    glEnableVertexAttribArray(attributePosition2D);
+    glEnableVertexAttribArray(attributeUV2D);
+}
 
-    void Graphics::begin3D()
-    {
-        glUseProgram(program3D.program);
-        glEnableVertexAttribArray(attributePosition3D);
-        glEnableVertexAttribArray(attributeNormal3D);
-    }
+void Graphics::begin3D()
+{
+    glUseProgram(program3D.program);
+    glEnableVertexAttribArray(attributePosition3D);
+    glEnableVertexAttribArray(attributeNormal3D);
+}
 
-    void Graphics::end2D()
-    {
-        glDisableVertexAttribArray(attributePosition2D);
-        glDisableVertexAttribArray(attributeUV2D);
-    }
+void Graphics::end2D()
+{
+    glDisableVertexAttribArray(attributePosition2D);
+    glDisableVertexAttribArray(attributeUV2D);
+}
 
-    void Graphics::end3D()
-    {
-        glDisableVertexAttribArray(attributePosition3D);
-        glDisableVertexAttribArray(attributeNormal3D);
+void Graphics::end3D()
+{
+    glDisableVertexAttribArray(attributePosition3D);
+    glDisableVertexAttribArray(attributeNormal3D);
 
-    }
+}
+
+void Graphics::translate3D(const glm::vec3 &position)
+{
+    glm::mat4x4 model;
+    model = glm::translate(model, position);
+    glUniformMatrix4fv(uniformM3D, 1, GL_FALSE, &model[0][0]);
+}

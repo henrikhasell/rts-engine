@@ -43,8 +43,9 @@ bool Heightmap::load(const char path[])
             {
                 for(int x = 0; x < w; x++)
                 {
-                    Uint8 *pixel = (Uint8*)surface->pixels + (surface->pitch * y) + (x * surface->format->BytesPerPixel);
-                    height[x + y * w] = (float)(pixel[0] + pixel[1] + pixel[2]) / 3.0f;
+                    const Uint8 *pixel = (Uint8*)surface->pixels + (surface->pitch * y) + (x * surface->format->BytesPerPixel);
+                    const float averageHeight = (float)(pixel[0] + pixel[1] + pixel[2]) / 3.0f;
+                    height[x + y * w] = averageHeight * (HEIGHTMAP_MAX_HEIGHT / 255.0f);
                 }
             }
 
@@ -94,4 +95,51 @@ void Heightmap::generateMesh()
     mesh.setVertices(vertexArray);
     mesh.setIndices(indexArray);
     mesh.calculateNormals();
+}
+
+btBvhTriangleMeshShape *Heightmap::generateCollisionMesh()
+{
+    btScalar *collisionVertices = new btScalar[w * h * 3];
+    unsigned short *collisionIndices = new unsigned short[w * h * 6];
+
+    for(int z = 0; z < h; z++)
+    {
+        for(int x = 0; x < w; x++)
+        {
+            const size_t index = x + w * z;
+
+            collisionVertices[(index * 3) + 0] = HEIGHTMAP_TILE_W * x;
+            collisionVertices[(index * 3) + 1] = height[index];
+            collisionVertices[(index * 3) + 2] = HEIGHTMAP_TILE_H * z;
+        }
+    }
+
+    for(int z = 0; z < h - 1; z++)
+    {
+        for(int x = 0; x < w - 1; x++)
+        {
+            const size_t index = x + w * z;
+
+            collisionIndices[(index * 6) + 0] = index + 1;
+            collisionIndices[(index * 6) + 1] = index + 0;
+            collisionIndices[(index * 6) + 2] = index + w;
+            collisionIndices[(index * 6) + 3] = index + 1;
+            collisionIndices[(index * 6) + 4] = index + w;
+            collisionIndices[(index * 6) + 5] = index + w + 1;
+        }
+    }
+    btIndexedMesh part;
+    part.m_vertexBase = (const unsigned char*)collisionVertices;
+    part.m_vertexStride = sizeof(btScalar) * 3;
+    part.m_numVertices = w * h;
+    part.m_triangleIndexBase = (const unsigned char*)collisionIndices;
+    part.m_triangleIndexStride = sizeof(unsigned short) * 3;
+    part.m_numTriangles = w * h * 2;
+    part.m_indexType = PHY_SHORT;
+
+    // TODO: Free this, lol
+    btTriangleIndexVertexArray* meshInterface = new btTriangleIndexVertexArray();
+    meshInterface->addIndexedMesh(part, PHY_SHORT);
+
+    return new btBvhTriangleMeshShape(meshInterface, true);
 }

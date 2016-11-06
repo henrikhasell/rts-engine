@@ -4,7 +4,7 @@
 #include <glm/vec3.hpp>
 #include "graphics.hpp"
 
-#define CAMERA_SPEED 10
+#define CAMERA_SPEED 5
 
 namespace Engine
 {
@@ -15,7 +15,8 @@ class Camera
 public:
     Camera();
     ~Camera();
-    void setView(const Graphics &graphics);
+    void applyView(Graphics &graphics);
+    void setPosition(const glm::vec3 &position);
     void panForward();
     void panBackward();
     void panLeft();
