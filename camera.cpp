@@ -20,7 +20,7 @@ void Camera::applyView(Graphics &graphics)
     glm::mat4x4 view = glm::lookAt(
         glm::vec3(
             position.x + 0.f,
-            position.y + 900.0f,
+            position.y + 500.0f,
             position.z + 300.0f
         ),
         position,

@@ -8,7 +8,7 @@
 
 #define HEIGHTMAP_TILE_W 5
 #define HEIGHTMAP_TILE_H 5
-#define HEIGHTMAP_MAX_HEIGHT 100
+#define HEIGHTMAP_MAX_HEIGHT 255
 
 namespace Engine
 {

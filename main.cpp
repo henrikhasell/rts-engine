@@ -112,7 +112,7 @@ int main (void)
 
                             Engine::GL::Heightmap heightmap;
 
-                            if(heightmap.load("assets/heightmap3.bmp") == true)
+                            if(heightmap.load("assets/heightmap.bmp") == true)
                             {
                                 heightmap.generateMesh();
                             }
