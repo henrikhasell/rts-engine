@@ -38,6 +38,7 @@ private:
     GLint uniformP3D;
     GLint uniformV3D;
     GLint uniformM3D;
+    GLint uniformViewPosition3D;
 
     GLint attributePosition3D;
     GLint attributeNormal3D;

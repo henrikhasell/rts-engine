@@ -79,6 +79,7 @@ int main (void)
                             Engine::GL::Mesh3D teapotMesh;
                             Engine::GL::Mesh3D cubeMesh;
                             Engine::GL::Mesh3D sphereMesh;
+                            Engine::GL::Mesh3D soldierMesh;
 
                             Engine::GL::Scene teapotScene;
                             teapotScene.load("models/teapot.obj");
@@ -89,6 +90,9 @@ int main (void)
                             Engine::GL::Scene cubeScene;
                             cubeScene.load("models/bigCube.obj");
 
+                            Engine::GL::Scene soldierScene;
+                            soldierScene.load("models/dwarf/dwarf.x");
+
                             Engine::GL::Font font;
                             font.load("fonts/NanumGothicCoding-Bold.ttf");
 
@@ -98,6 +102,7 @@ int main (void)
                             teapotScene.createMesh(teapotMesh);
                             sphereScene.createMesh(sphereMesh);
                             cubeScene.createMesh(cubeMesh);
+                            soldierScene.createMesh(soldierMesh);
 
                             SDL_StartTextInput();
 
@@ -112,7 +117,7 @@ int main (void)
 
                             Engine::GL::Heightmap heightmap;
 
-                            if(heightmap.load("assets/heightmap.bmp") == true)
+                            if(heightmap.load("assets/flat.bmp") == true)
                             {
                                 heightmap.generateMesh();
                             }
@@ -137,15 +142,13 @@ int main (void)
                                     btVector3(10.0f, 10.0f, 10.0f)
                                 );
                             */
-                                new btSphereShape(
-                                    12.5f
-                                );
+                                new btSphereShape(1.0f);
 
                             btDefaultMotionState* fallMotionState =
                                 new btDefaultMotionState(
                                     btTransform(
                                         btQuaternion(0, 0, 0, 1),
-                                        btVector3(400, 300, 400)
+                                        btVector3(10,100, 10)
                                     )
                                 );
 
@@ -161,7 +164,7 @@ int main (void)
                                 new btDefaultMotionState(
                                     btTransform(
                                         btQuaternion(0, 0, 0, 1),
-                                        btVector3(0, 10, 0)
+                                        btVector3(0, 0, 0)
                                     )
                                 ),
                                 heightmap.generateCollisionMesh(),
@@ -251,6 +254,7 @@ int main (void)
                                     sphereMesh.draw(graphics, translate, rotate);
 
                                     teapotMesh.draw(graphics, glm::vec3(200, 200, 200));
+                                    soldierMesh.draw(graphics, glm::vec3(0, 0, 0));
                                     heightmap.draw(graphics);
                                 graphics.end3D();
 

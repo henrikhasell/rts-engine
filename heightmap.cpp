@@ -82,13 +82,18 @@ void Heightmap::generateMesh()
         {
             const GLuint index = z * w + x;
 
-            indexArray.emplace_back(index + 1);
-            indexArray.emplace_back(index);
-            indexArray.emplace_back(index + w);
+            const GLuint v1 = index + 1;
+            const GLuint v2 = index + 0;
+            const GLuint v3 = index + w;
+            const GLuint v4 = index + w + 1;
 
-            indexArray.emplace_back(index + 1);
-            indexArray.emplace_back(index + w);
-            indexArray.emplace_back(index + w + 1);
+            indexArray.emplace_back(v1);
+            indexArray.emplace_back(v2);
+            indexArray.emplace_back(v3);
+
+            indexArray.emplace_back(v1);
+            indexArray.emplace_back(v3);
+            indexArray.emplace_back(v4);
         }
     }
 
@@ -120,12 +125,17 @@ btBvhTriangleMeshShape *Heightmap::generateCollisionMesh()
         {
             const size_t index = x + w * z;
 
-            collisionIndices[(index * 6) + 0] = index + 1;
-            collisionIndices[(index * 6) + 1] = index + 0;
-            collisionIndices[(index * 6) + 2] = index + w;
-            collisionIndices[(index * 6) + 3] = index + 1;
-            collisionIndices[(index * 6) + 4] = index + w;
-            collisionIndices[(index * 6) + 5] = index + w + 1;
+            const size_t v1 = index + 1;
+            const size_t v2 = index + 0;
+            const size_t v3 = index + w;
+            const size_t v4 = index + w + 1;
+
+            collisionIndices[(index * 6) + 0] = v1;
+            collisionIndices[(index * 6) + 1] = v2;
+            collisionIndices[(index * 6) + 2] = v3;
+            collisionIndices[(index * 6) + 3] = v1;
+            collisionIndices[(index * 6) + 4] = v3;
+            collisionIndices[(index * 6) + 5] = v4;
         }
     }
     btIndexedMesh part;

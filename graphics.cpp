@@ -49,6 +49,7 @@ bool Graphics::initialise()
                 uniformP3D = glGetUniformLocation(program3D.program, "projectionMatrix");
                 uniformV3D = glGetUniformLocation(program3D.program, "viewMatrix");
                 uniformM3D = glGetUniformLocation(program3D.program, "modelMatrix");
+                uniformViewPosition3D = glGetUniformLocation(program3D.program, "viewPosition");
 /*
                 std::cout << "[3D] projectionMatrix: " << uniformP3D << std::endl;
                 std::cout << "[3D] viewMatrix: " << uniformV3D << std::endl;
@@ -88,7 +89,7 @@ bool Graphics::initialise()
                             std::cout << "[2D] modelMatrix: " << uniformM3D << std::endl;
 */
                             glEnable(GL_DEPTH_TEST);
-                            //glEnable(GL_CULL_FACE);
+                            glEnable(GL_CULL_FACE);
 
                             glEnable(GL_BLEND);
                             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

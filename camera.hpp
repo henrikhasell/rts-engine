@@ -4,7 +4,7 @@
 #include <glm/vec3.hpp>
 #include "graphics.hpp"
 
-#define CAMERA_SPEED 5
+#define CAMERA_SPEED 1
 
 namespace Engine
 {

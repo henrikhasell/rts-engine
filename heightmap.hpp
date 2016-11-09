@@ -6,9 +6,9 @@
 #include "graphics.hpp"
 #include "mesh3d.hpp"
 
-#define HEIGHTMAP_TILE_W 5
-#define HEIGHTMAP_TILE_H 5
-#define HEIGHTMAP_MAX_HEIGHT 255
+#define HEIGHTMAP_TILE_W 1
+#define HEIGHTMAP_TILE_H 1
+#define HEIGHTMAP_MAX_HEIGHT 10
 
 namespace Engine
 {
