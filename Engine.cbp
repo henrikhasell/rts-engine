@@ -46,6 +46,8 @@
 			<Add library="BulletDynamics" />
 			<Add library="LinearMath" />
 		</Linker>
+		<Unit filename="animation.cpp" />
+		<Unit filename="animation.hpp" />
 		<Unit filename="camera.cpp" />
 		<Unit filename="camera.hpp" />
 		<Unit filename="console.cpp" />

@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <btBulletDynamicsCommon.h>
 
+#include "animation.hpp"
 #include "graphics.hpp"
 #include "heightmap.hpp"
 #include "console.hpp"
@@ -99,6 +100,10 @@ int main (void)
                             Engine::GL::Mesh2D greetingText;
                             font.renderString(greetingText, "안녕하세요, 세계!");
 
+                            Engine::GL::AnimatedMesh test;
+                            test.load("models/dwarf/dwarf.x");
+                            return 0;
+
                             teapotScene.createMesh(teapotMesh);
                             sphereScene.createMesh(sphereMesh);
                             cubeScene.createMesh(cubeMesh);
@@ -148,7 +153,7 @@ int main (void)
                                 new btDefaultMotionState(
                                     btTransform(
                                         btQuaternion(0, 0, 0, 1),
-                                        btVector3(10,100, 10)
+                                        btVector3(10, 25, 10)
                                     )
                                 );
 
@@ -223,7 +228,7 @@ int main (void)
                                         camera.panRight();
 
                                     btTransform trans;
-                                    dynamicsWorld->stepSimulation(0.1f, 10);
+                                    dynamicsWorld->stepSimulation(1.0/60.0f, 100);
                                     fallRigidBody->getMotionState()->getWorldTransform(trans);
 
                                 }
@@ -256,6 +261,7 @@ int main (void)
                                     teapotMesh.draw(graphics, glm::vec3(200, 200, 200));
                                     soldierMesh.draw(graphics, glm::vec3(0, 0, 0));
                                     heightmap.draw(graphics);
+                                    test.draw(graphics, 0);
                                 graphics.end3D();
 
                                 graphics.begin2D();

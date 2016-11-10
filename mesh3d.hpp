@@ -15,7 +15,6 @@ namespace GL
 class Mesh3D
 {
 public:
-    static bool loadHeightMap(Mesh3D &mesh, const char path[]);
     Mesh3D();
     ~Mesh3D();
     void setVertices(const std::vector<glm::vec3> &vertexArray);
