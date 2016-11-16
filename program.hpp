@@ -19,6 +19,7 @@ public:
     ~Program();
     bool link(const Shader &a, const Shader &b);
     bool linkStatus();
+    std::string infoLog();
 private:
     GLuint program;
 }; // Program

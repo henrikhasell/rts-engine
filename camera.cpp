@@ -21,20 +21,13 @@ void Camera::applyView(Graphics &graphics)
         glm::vec3(
             position.x + 0.f,
             position.y + 100.0f,
-            position.z + 100.0f
+            position.z + 200.0f
         ),// 50, 30
         position,
         glm::vec3( 0.0f, 1.0f, 0.0f )
     );
 
-    glUniformMatrix4fv(graphics.uniformV3D, 1, GL_FALSE, &view[0][0]);
     graphics.matrixV3D = view;
-
-    glUniform3f(graphics.uniformViewPosition3D,
-        position.x,
-        position.y + 100.0f,
-        position.z + 100.0f
-    );
 }
 
 void Camera::panForward()

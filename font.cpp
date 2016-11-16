@@ -38,10 +38,10 @@ bool Font::renderString(Mesh2D &mesh, const char string[]) const
         float h = surface->h;
 
         std::vector<glm::vec2> vertexArray {
-            {0.0f, 0.0f}, {w, 0.0f}, {0.0f, h}, {w, h}
+            {w, 0.0f}, {0.0f, 0.0f}, {w, h}, {0.0f, h}
         };
         std::vector<glm::vec2> uvArray {
-            {0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f}
+            {1.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}
         };
         std::vector<GLuint> indexArray {
             1, 0, 2, 1, 2, 3

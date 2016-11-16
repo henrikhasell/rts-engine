@@ -26,6 +26,9 @@ public:
     void end2D();
     void end3D();
     void translate3D(const glm::vec3 &position);
+protected:
+    bool initialise2D();
+    bool initialise3D();
 private:
     Shader fragmentShader3D;
     Shader vertexShader3D;

@@ -18,7 +18,7 @@ public:
     bool load(const char path[]);
     bool compile(std::string source);
     bool compileStatus();
-    std::string compileLog();
+    std::string infoLog();
 private:
     GLuint shader;
 }; // Shader

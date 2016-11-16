@@ -4,7 +4,7 @@
 #include "mesh2d.hpp"
 #include <SDL2/SDL_ttf.h>
 
-#define FONT_SIZE 18
+#define FONT_SIZE 32
 
 namespace Engine
 {

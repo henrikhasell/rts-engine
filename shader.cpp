@@ -58,7 +58,7 @@ bool Shader::compileStatus()
     return result == GL_TRUE;
 }
 
-std::string Shader::compileLog()
+std::string Shader::infoLog()
 {
     GLint length;
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);

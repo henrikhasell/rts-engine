@@ -28,9 +28,9 @@ bool Scene::load(const char path[])
     Assimp::Importer importer;
 
     const aiScene *scene = importer.ReadFile(path,
-        aiProcess_Triangulate           |
-        aiProcess_GenNormals      |
-        aiProcess_GenUVCoords           |
+        aiProcess_Triangulate     |
+        aiProcess_GenSmoothNormals|
+        aiProcess_GenUVCoords     |
         aiProcess_SortByPType
         );
 
