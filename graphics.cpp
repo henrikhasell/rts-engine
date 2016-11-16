@@ -8,8 +8,8 @@ using namespace GL;
 
 Graphics::Graphics(SDL_Window *window) :
     fragmentShader3D(GL_FRAGMENT_SHADER),
-    vertexShader3D(GL_VERTEX_SHADER),
     fragmentShader2D(GL_FRAGMENT_SHADER),
+    vertexShader3D(GL_VERTEX_SHADER),
     vertexShader2D(GL_VERTEX_SHADER)
 {
     int w;
@@ -88,6 +88,8 @@ bool Graphics::initialise2D()
         {
             if(program2D.link(fragmentShader2D, vertexShader2D) == true)
             {
+                getAttribs2D();
+                getUniforms2D();
                 result = true;
             }
             else
@@ -118,6 +120,8 @@ bool Graphics::initialise3D()
         {
             if(program3D.link(fragmentShader3D, vertexShader3D) == true)
             {
+                getAttribs3D();
+                getUniforms3D();
                 result = true;
             }
             else
@@ -136,6 +140,34 @@ bool Graphics::initialise3D()
     }
 
     return result;
+}
+
+void Graphics::getAttribs2D()
+{
+    attributePosition2D = glGetAttribLocation(program2D.program, "in_Position");
+    attributeUV2D = glGetAttribLocation(program2D.program, "in_UV");
+}
+
+void Graphics::getAttribs3D()
+{
+    attributePosition3D = glGetAttribLocation(program3D.program, "in_Position");
+    attributeNormal3D = glGetAttribLocation(program3D.program, "in_Normal");
+}
+
+void Graphics::getUniforms2D()
+{
+    uniformP2D = glGetUniformLocation(program2D.program, "projectionMatrix");
+    uniformV2D = glGetUniformLocation(program2D.program, "viewMatrix");
+    uniformM2D = glGetUniformLocation(program2D.program, "modelMatrix");
+    uniformTextureSampler2D = glGetUniformLocation(program2D.program, "textureSampler");
+}
+
+void Graphics::getUniforms3D()
+{
+    uniformP3D = glGetUniformLocation(program3D.program, "projectionMatrix");
+    uniformV3D = glGetUniformLocation(program3D.program, "viewMatrix");
+    uniformM3D = glGetUniformLocation(program3D.program, "modelMatrix");
+    uniformViewPosition3D = glGetUniformLocation(program3D.program, "viewPosition");
 }
 
 void Graphics::begin2D()

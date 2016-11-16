@@ -29,37 +29,45 @@ public:
 protected:
     bool initialise2D();
     bool initialise3D();
+    void getAttribs2D();
+    void getAttribs3D();
+    void getUniforms2D();
+    void getUniforms3D();
 private:
     Shader fragmentShader3D;
+    Shader fragmentShader2D;
+
     Shader vertexShader3D;
+    Shader vertexShader2D;
+
     Program program3D;
+    Program program2D;
 
     glm::mat4x4 matrixP3D;
     glm::mat4x4 matrixV3D;
     glm::mat4x4 matrixM3D;
 
-    GLint uniformP3D;
-    GLint uniformV3D;
-    GLint uniformM3D;
-    GLint uniformViewPosition3D;
-
-    GLint attributePosition3D;
-    GLint attributeNormal3D;
-
-    Shader fragmentShader2D;
-    Shader vertexShader2D;
-    Program program2D;
-
     glm::mat4x4 matrixP2D;
     glm::mat4x4 matrixV2D;
     glm::mat4x4 matrixM2D;
 
-    GLint uniformTextureSampler2D;
+    GLint uniformP3D;
+    GLint uniformV3D;
+    GLint uniformM3D;
+
     GLint uniformP2D;
     GLint uniformV2D;
     GLint uniformM2D;
 
+    GLint uniformViewPosition3D;
+
+    GLint uniformTextureSampler2D;
+
+    GLint attributePosition3D;
     GLint attributePosition2D;
+
+    GLint attributeNormal3D;
+
     GLint attributeUV2D;
 }; // Graphics
 }; // GL
