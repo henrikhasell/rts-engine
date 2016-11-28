@@ -38,27 +38,11 @@ bool Graphics::initialise()
     {
         glUseProgram(program3D.program);
 
-        attributePosition3D = glGetAttribLocation(program3D.program, "in_Position");
-        attributeNormal3D = glGetAttribLocation(program3D.program, "in_Normal");
-
-        uniformP3D = glGetUniformLocation(program3D.program, "projectionMatrix");
-        uniformV3D = glGetUniformLocation(program3D.program, "viewMatrix");
-        uniformM3D = glGetUniformLocation(program3D.program, "modelMatrix");
-        uniformViewPosition3D = glGetUniformLocation(program3D.program, "viewPosition");
-
         glUniformMatrix4fv(uniformP3D, 1, GL_FALSE, &matrixP3D[0][0]);
         glUniformMatrix4fv(uniformV3D, 1, GL_FALSE, &matrixV3D[0][0]);
         glUniformMatrix4fv(uniformM3D, 1, GL_FALSE, &matrixM3D[0][0]);
 
         glUseProgram(program2D.program);
-
-        attributePosition2D = glGetAttribLocation(program2D.program, "in_Position");
-        attributeUV2D = glGetAttribLocation(program2D.program, "in_UV");
-
-        uniformTextureSampler2D = glGetUniformLocation(program2D.program, "textureSampler");
-        uniformP2D = glGetUniformLocation(program2D.program, "projectionMatrix");
-        uniformV2D = glGetUniformLocation(program2D.program, "viewMatrix");
-        uniformM2D = glGetUniformLocation(program2D.program, "modelMatrix");
 
         glUniform1i(uniformTextureSampler2D, 0);
         glUniformMatrix4fv(uniformP2D, 1, GL_FALSE, &matrixP2D[0][0]);
@@ -88,6 +72,7 @@ bool Graphics::initialise2D()
         {
             if(program2D.link(fragmentShader2D, vertexShader2D) == true)
             {
+                glUseProgram(program2D.program);
                 getAttribs2D();
                 getUniforms2D();
                 result = true;
@@ -120,6 +105,7 @@ bool Graphics::initialise3D()
         {
             if(program3D.link(fragmentShader3D, vertexShader3D) == true)
             {
+                glUseProgram(program3D.program);
                 getAttribs3D();
                 getUniforms3D();
                 result = true;
