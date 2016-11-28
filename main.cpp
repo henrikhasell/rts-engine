@@ -127,6 +127,10 @@ int main (void)
                                                 // TODO
                                             }
                                         }
+                                        else if(event.type == SDL_TEXTINPUT)
+                                        {
+                                            console.appendInput(font, event.text.text);
+                                        }
                                     }
                                 }
 
@@ -150,6 +154,7 @@ int main (void)
 
                                 graphics.begin2D();
                                     text.draw(graphics);
+                                    console.draw(graphics);
                                 graphics.end2D();
 
                                 SDL_GL_SwapWindow(window);
