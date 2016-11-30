@@ -72,8 +72,10 @@
 		<Unit filename="shader.hpp" />
 		<Unit filename="shaders/fragment2D.glsl" />
 		<Unit filename="shaders/fragment3D.glsl" />
+		<Unit filename="shaders/fragmentAnim.glsl" />
 		<Unit filename="shaders/vertex2D.glsl" />
 		<Unit filename="shaders/vertex3D.glsl" />
+		<Unit filename="shaders/vertexAnim.glsl" />
 		<Unit filename="texture.cpp" />
 		<Unit filename="texture.hpp" />
 		<Extensions>
