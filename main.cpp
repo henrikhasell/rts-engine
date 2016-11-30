@@ -82,6 +82,8 @@ int main (void)
                             Engine::GL::Mesh2D text;
                             Engine::GL::Font font;
                             Engine::GL::Console console;
+                            Engine::GL::AnimatedMesh animatedMesh;
+                            animatedMesh.loadFile("models/dwarf.h");
 
                             if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                 std::cout << "Successfully loaded font!" << std::endl;

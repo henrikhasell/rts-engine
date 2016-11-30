@@ -22,6 +22,7 @@ public:
     AnimatedMesh();
     ~AnimatedMesh();
     bool loadScene(const aiScene *scene);
+    bool loadFile(const char path[]);
 private:
     std::vector<glm::vec3> vertexPosition;
     std::vector<glm::vec3> vertexNormal;
