@@ -1,11 +1,8 @@
 #version 130
 
 in vec3 ex_Normal;
-in vec3 in_FragmentPosition;
 
 out vec4 out_Color;
-
-uniform vec3 viewPosition;
 
 void main(void)
 {

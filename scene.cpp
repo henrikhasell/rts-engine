@@ -28,10 +28,11 @@ bool Scene::load(const char path[])
     Assimp::Importer importer;
 
     const aiScene *scene = importer.ReadFile(path,
-        aiProcess_Triangulate     |
-        aiProcess_GenSmoothNormals|
-        aiProcess_GenUVCoords     |
-        aiProcess_SortByPType
+        //aiProcessPreset_TargetRealtime_Quality |
+        //aiProcess_FindInstances |
+        aiProcess_ValidateDataStructure |
+        aiProcess_OptimizeMeshes |
+        aiProcess_Triangulate
         );
 
     vertexBuffer.clear();

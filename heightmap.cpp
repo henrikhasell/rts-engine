@@ -99,7 +99,6 @@ void Heightmap::generateMesh()
 
     mesh.setVertices(vertexArray);
     mesh.setIndices(indexArray);
-    mesh.calculateNormals();
 }
 
 btBvhTriangleMeshShape *Heightmap::generateCollisionMesh()

@@ -42,6 +42,7 @@
 			<Add library="SDL2_ttf" />
 			<Add library="GLEW" />
 			<Add library="GL" />
+			<Add library="GLU" />
 			<Add library="BulletCollision" />
 			<Add library="BulletDynamics" />
 			<Add library="LinearMath" />

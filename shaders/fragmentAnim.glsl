@@ -1,34 +1,14 @@
 #version 130
 
-uniform vec3 lightPosition;
-uniform vec4 lightAmbientColor;
-uniform vec4 lightDiffuseColor;
-uniform int useTexture;
-uniform sampler2D texture;
+in vec3 ex_Normal;
 
-in vec4 worldPosition;
-in vec3 worldNormal;
-in vec4 outColor;
-in vec2 outTexCoord;
+out vec4 out_Color;
 
-void main()
+void main(void)
 {
-    vec3 normal = normalize(worldNormal);
-    vec3 position = worldPosition.xyz - worldPosition.w;
-    vec3 lightVector = normalize(lightPosition);
-    vec4 fragColor;
-
-    if (useTexture == 0)
-    {
-        fragColor = outColor;
-    }
-    else
-    {
-        fragColor = texture2D(texture, outTexCoord);
-    }
-
-    vec4 ambient = fragColor * lightAmbientColor;
-    vec4 diffuse = fragColor * lightDiffuseColor * max(0.0, dot(normal, lightVector));
-
-    gl_FragColor = ambient + diffuse;
+    vec3 lightDirection = vec3(0.0, -1.0, 0.0);
+    vec3 lightColour = vec3(0.2, 0.2, 0.2);
+    vec3 ambientLight = vec3(0.2, 0.2, 0.2);
+    float lightIntensity = dot(lightDirection, ex_Normal);
+	out_Color = vec4(ambientLight + (lightColour * lightIntensity), 1.0);
 }

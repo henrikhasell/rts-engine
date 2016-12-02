@@ -1,38 +1,34 @@
 #version 130
 
+in vec4 in_Position;
+in vec3 in_Normal;
+in vec2 in_TexCoord;
+in vec4 in_BoneWeights;
+in vec4 in_BoneIndices;
+
+out vec3 ex_Normal;
+out vec2 ex_TexCoord;
+
 uniform mat4 projectionMatrix;
-uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
 uniform mat4 boneMatrices[60];
-
-in vec4 inPosition;
-in vec3 inNormal;
-in vec4 inColor;
-in vec2 inTexCoord;
-in vec4 inBoneWeights;
-in vec4 inBoneIndices;
-
-out vec4 worldPosition;
-out vec3 worldNormal;
-out vec4 outColor;
-out vec2 outTexCoord;
 
 void main()
 {
-    vec4 boneWeights = inBoneWeights;
+
+    vec4 boneWeights = in_BoneWeights;
     boneWeights.w = 1.0 - dot(boneWeights.xyz, vec3(1.0, 1.0, 1.0));
 
-    mat4 transformMatrix = boneWeights.x * boneMatrices[int(inBoneIndices.x)];
-    transformMatrix += boneWeights.y * boneMatrices[int(inBoneIndices.y)];
-    transformMatrix += boneWeights.z * boneMatrices[int(inBoneIndices.z)];
-    transformMatrix += boneWeights.w * boneMatrices[int(inBoneIndices.w)];
+    mat4 transformMatrix = boneWeights.x * boneMatrices[int(in_BoneIndices.x)];
+    transformMatrix += boneWeights.y * boneMatrices[int(in_BoneIndices.y)];
+    transformMatrix += boneWeights.z * boneMatrices[int(in_BoneIndices.z)];
+    transformMatrix += boneWeights.w * boneMatrices[int(in_BoneIndices.w)];
 
-    vec4 newPosition = transformMatrix * inPosition;
-    vec4 newNormal = transformMatrix * vec4(inNormal, 0.0);
-    worldNormal = (modelMatrix * newNormal).xyz;
+    vec4 modified_Position = transformMatrix * in_Position;
+    vec4 modified_Normal = transformMatrix * vec4(in_Normal, 0.0);
 
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * newPosition;
-    worldPosition = modelMatrix * newPosition;
-    outColor = inColor;
-    outTexCoord = inTexCoord;
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * modified_Position;
+    ex_Normal = (modelMatrix * modified_Normal).xyz;
+    ex_TexCoord = in_TexCoord;
 };

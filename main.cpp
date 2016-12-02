@@ -76,14 +76,16 @@ int main (void)
 
                             std::cout << "Successfully initialised the graphics sub-system." << std::endl;
 
-                            Engine::GL::Camera camera;
-                            Engine::GL::Scene teapotScene;
-                            Engine::GL::Mesh3D teapotMesh;
                             Engine::GL::Mesh2D text;
                             Engine::GL::Font font;
+
+                            Engine::GL::Model3D teapotModel;
                             Engine::GL::Console console;
-                            Engine::GL::AnimatedMesh animatedMesh;
-                            animatedMesh.loadFile("models/dwarf.h");
+
+
+                            Engine::GL::AnimatedModel animatedModel;
+                            animatedModel.loadFile("models/dwarf/dwarf.x");
+
 
                             if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                 std::cout << "Successfully loaded font!" << std::endl;
@@ -93,9 +95,8 @@ int main (void)
                                 std::cout << "Successfully created text mesh!" << std::endl;
                             }
 
-                            if(teapotScene.load("models/teapot.obj") == true) {
+                            if(teapotModel.loadFile("models/dwarf/dwarf.x") == true) {
                                 std::cout << "Successfully loaded teapot!" << std::endl;
-                                teapotScene.createMesh(teapotMesh);
                             }
 
                             Uint32 timeStep = 0;
@@ -145,14 +146,19 @@ int main (void)
 
                                 for(int error = glGetError(); error != GL_NO_ERROR; error = glGetError())
                                 {
-                                    std::cerr << "An OpenGL eror has occured: " << error << std::endl;
+                                    std::cerr << "An OpenGL eror has occured: " << gluErrorString(error) << std::endl;
                                 }
 
-                                camera.applyView(graphics);
-
+                                //camera.applyView(graphics);
+/*
                                 graphics.begin3D();
-                                    teapotMesh.draw(graphics);
+                                    teapotModel.draw(graphics);
                                 graphics.end3D();
+*/
+                                graphics.beginAnim();
+                                    animatedModel.draw(graphics);
+                                graphics.endAnim();
+
 
                                 graphics.begin2D();
                                     text.draw(graphics);
@@ -163,6 +169,7 @@ int main (void)
 
                                 frameTime = SDL_GetTicks() - frameTime;
                                 timeStep += frameTime;
+
                             }
                         }
                         else

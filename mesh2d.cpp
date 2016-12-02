@@ -53,7 +53,7 @@ void Mesh2D::draw(const Graphics &graphics, const glm::vec2 &position)
     glVertexAttribPointer(graphics.attributePosition3D, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[UV_BUFFER]);
-    glVertexAttribPointer(graphics.attributeUV2D, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(graphics.attributeTexCoord2D, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[INDEX_BUFFER]);
     glDrawElements(GL_TRIANGLES, indexArray.size(), GL_UNSIGNED_INT, (void*)0);
