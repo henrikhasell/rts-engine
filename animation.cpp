@@ -89,7 +89,7 @@ void AnimatedModel::draw(const Graphics &graphics)
     {
         aiMesh *currentMesh = scene->mMeshes[i];
 
-        std::vector<glm::mat4x4> boneMatrices = calculateBoneMatrices(scene->mRootNode, currentMesh);
+        std::vector<glm::mat4x4> boneMatrices = calculateBoneMatrices(currentMesh);
         glUniformMatrix4fv(graphics.uniformBoneMatricesAnim, 60, GL_FALSE, (GLfloat*)&boneMatrices[0]);
         meshArray[i].draw(graphics);
     }
@@ -98,11 +98,6 @@ void AnimatedModel::draw(const Graphics &graphics)
 static glm::vec3 toVec3(const aiVector3D &vector)
 {
     return glm::vec3(vector.x, vector.y, vector.z);
-}
-
-static glm::quat toQuat(const aiQuaternion &quaternion)
-{
-    return glm::quat(quaternion.w, quaternion.x, quaternion.y, quaternion.z);
 }
 
 static glm::mat4x4 toMatrix(const aiMatrix4x4 &matrix)
@@ -127,66 +122,145 @@ static glm::mat4x4 toMatrix(const aiMatrix4x4 &matrix)
     return result;
 }
 
-static glm::mat4x4 getGlobalTransform(const aiNode *node)
+static glm::vec3 interpolatePosition(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime)
 {
-    glm::mat4x4 result = toMatrix(node->mTransformation);
-/*
-    while((node = node->mParent))
+    currentTime = fmod(currentTime, animation->mDuration);
+
+    unsigned int currentFrame = 0;
+
+    while(currentFrame < channel->mNumPositionKeys - 1)
     {
-        result = toMatrix(node->mTransformation);
+        if(currentTime < channel->mPositionKeys[currentFrame + 1].mTime)
+        {
+            break;
+        }
+        currentFrame++;
     }
-*/
-    while(node->mParent)
+
+    unsigned int nextFrame = (currentFrame + 1) >= channel->mNumPositionKeys ? 0 : (currentFrame + 1);
+
+    const aiVectorKey &currentKey = channel->mPositionKeys[currentFrame];
+    const aiVectorKey &nextKey = channel->mPositionKeys[nextFrame];
+
+    double timeDifference = nextKey.mTime - currentKey.mTime;
+
+    if(timeDifference < 0)
     {
-        result = toMatrix(node->mParent->mTransformation);
-        node = node->mParent;
+        timeDifference += animation->mDuration;
     }
-    return result;
+
+    const double interpolationFactor = timeDifference != 0.0
+    ? (currentTime - currentKey.mTime) / timeDifference : 0.0;
+
+    return toVec3(currentKey.mValue) + toVec3(nextKey.mValue - currentKey.mValue) * (float)interpolationFactor;
 }
 
-std::vector<glm::mat4x4> AnimatedModel::calculateBoneMatrices(const aiNode *node, const aiMesh* mesh)
+static glm::mat4x4 interpolateRotation(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime)
+{
+    currentTime = fmod(currentTime, animation->mDuration);
+
+    unsigned int currentFrame = 0;
+
+    while(currentFrame < channel->mNumRotationKeys - 1)
+    {
+        if(currentTime < channel->mRotationKeys[currentFrame + 1].mTime)
+        {
+            break;
+        }
+        currentFrame++;
+    }
+
+    unsigned int nextFrame = (currentFrame + 1) >= channel->mNumRotationKeys ? 0 : (currentFrame + 1);
+
+    const aiQuatKey &currentKey = channel->mRotationKeys[currentFrame];
+    const aiQuatKey &nextKey = channel->mRotationKeys[nextFrame];
+
+    double timeDifference = nextKey.mTime - currentKey.mTime;
+
+    if(timeDifference < 0)
+    {
+        timeDifference += animation->mDuration;
+    }
+
+    const double interpolationFactor = timeDifference != 0.0
+    ? (currentTime - currentKey.mTime) / timeDifference : 0.0;
+
+    aiQuaternion result;
+    aiQuaternion::Interpolate(result, currentKey.mValue, nextKey.mValue, (float)interpolationFactor);
+
+    return toMatrix(aiMatrix4x4(result.GetMatrix()));
+}
+
+
+static glm::vec3 interpolateScale(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime)
+{
+    currentTime = fmod(currentTime, animation->mDuration);
+
+    unsigned int currentFrame = 0;
+
+    while(currentFrame < channel->mNumScalingKeys - 1)
+    {
+        if(currentTime < channel->mScalingKeys[currentFrame + 1].mTime)
+        {
+            break;
+        }
+        currentFrame++;
+    }
+
+    unsigned int nextFrame = (currentFrame + 1) >= channel->mNumScalingKeys ? 0 : (currentFrame + 1);
+
+    const aiVectorKey &currentKey = channel->mScalingKeys[currentFrame];
+    const aiVectorKey &nextKey = channel->mScalingKeys[nextFrame];
+
+    double timeDifference = nextKey.mTime - currentKey.mTime;
+
+    if(timeDifference < 0)
+    {
+        timeDifference += animation->mDuration;
+    }
+
+    const double interpolationFactor = timeDifference != 0.0
+    ? (currentTime - currentKey.mTime) / timeDifference : 0.0;
+
+    return toVec3(currentKey.mValue) + toVec3(nextKey.mValue - currentKey.mValue) * (float)interpolationFactor;
+}
+
+glm::mat4x4 AnimatedModel::getNodeTransform(const aiNode *node, double timeElapsed)
+{
+    const std::string name(node->mName.data);
+    const aiNodeAnim *currentChannel = channelsByName[name];
+
+    const glm::mat4x4 channelRotation = interpolateRotation(scene->mAnimations[0], currentChannel, timeElapsed);
+    const glm::mat4x4 channelScale = glm::scale(glm::mat4x4(), interpolateScale(scene->mAnimations[0], currentChannel, timeElapsed));
+    const glm::mat4x4 channelPosition = glm::translate(glm::mat4x4(), interpolatePosition(scene->mAnimations[0], currentChannel, timeElapsed)/*toVec3(currentChannel->mPositionKeys[0].mValue)*/);
+
+    const glm::mat4x4 channelTransform = channelRotation * channelScale * channelPosition;
+
+    if(node->mParent)
+    {
+        return getNodeTransform(node->mParent, timeElapsed) * channelTransform;
+    }
+
+    return channelTransform;
+}
+
+std::vector<glm::mat4x4> AnimatedModel::calculateBoneMatrices(const aiMesh* mesh)
 {
     std::vector<glm::mat4x4> boneMatrices(mesh->mNumBones);
 
-    static unsigned int frame = 0;
+    static double timeElapsed = 0.0f;
 
     for(unsigned int i = 0; i < mesh->mNumBones; i++)
     {
         const aiBone *currentBone = mesh->mBones[i];
-
         const std::string name(currentBone->mName.data);
-
         const aiNode *currentNode = nodesByName[name];
-        const aiNodeAnim *currentChannel = channelsByName[name];
 
-        const glm::vec3 channelPosition = toVec3(currentChannel->mPositionKeys[frame].mValue);
-        const glm::quat channelRotation = toQuat(currentChannel->mRotationKeys[frame].mValue);
-        const glm::vec3 channelScale = toVec3(currentChannel->mScalingKeys[frame].mValue);
-
-        const glm::mat4x4 globalTransform = getGlobalTransform(currentNode);
-        const glm::mat4x4 inverseTransform = glm::inverse(globalTransform);
-        const glm::mat4x4 boneTransform = toMatrix(currentBone->mOffsetMatrix);
-
-        const glm::mat4x4 channelTransform =
-            glm::translate(
-                glm::mat4x4(), channelPosition
-            ) *
-            glm::rotate(
-                glm::mat4x4(), channelRotation.w, glm::vec3(channelRotation.x, channelRotation.y, channelRotation.z)
-            ) *
-            glm::scale(
-                glm::mat4x4(), channelScale
-            );
-
-        boneMatrices[i] = inverseTransform * globalTransform * boneTransform;///*inverseTransform * */globalTransform * channelTransform/* * boneTransform*/;
-        std::cout << "Scale: " << channelScale.x << ", " << channelScale.y << ", " << channelScale.z << std::endl;
+        const glm::mat4x4 boneTransform = getNodeTransform(currentNode, timeElapsed) * toMatrix(currentBone->mOffsetMatrix);
+        boneMatrices[i] = boneTransform;
     }
 
-SDL_Delay(100);
-    frame++;
-
-    if(frame >= scene->mAnimations[0]->mNumChannels)
-        frame = 0;
+    timeElapsed += 0.1;
 
     return boneMatrices;
 }
@@ -214,6 +288,7 @@ bool AnimatedMesh::loadMesh(const aiMesh *mesh)
     std::vector<glm::vec2> textureCoordArray(mesh->mNumVertices);
     std::vector<glm::uvec4> boneIndexArray(mesh->mNumVertices);
     std::vector<glm::vec4> boneWeightArray(mesh->mNumVertices);
+    std::vector<GLuint> vertexIndexArray;
 
     for(unsigned int j = 0; j < mesh->mNumVertices; j++)
     {
@@ -225,8 +300,6 @@ bool AnimatedMesh::loadMesh(const aiMesh *mesh)
         normalArray[j] = glm::vec3(currentNormal->x, currentNormal->y, currentNormal->z);
         textureCoordArray[j] = glm::vec2(currentTextureCoord->x, 1.0f - currentTextureCoord->y);
     }
-
-    std::vector<GLuint> vertexIndexArray;
 
     for(unsigned int j = 0; j < mesh->mNumFaces; j++)
     {

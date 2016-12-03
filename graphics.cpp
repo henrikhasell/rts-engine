@@ -75,13 +75,13 @@ bool Graphics::initialise()
         glUniformMatrix4fv(uniformMAnim, 1, GL_FALSE, &matrixMAnim[0][0]);
 */
         glEnable(GL_DEPTH_TEST);
-        // glEnable(GL_CULL_FACE);
+        glEnable(GL_CULL_FACE);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glFrontFace(GL_CW);
+        //glFrontFace(GL_CW);
     }
 
     return result;

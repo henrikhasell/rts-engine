@@ -39,11 +39,12 @@ public:
     bool loadScene(const aiScene *scene);
     bool loadFile(const char path[]);
     void draw(const Graphics &graphics);
-    std::vector<glm::mat4x4> calculateBoneMatrices(const aiNode *node, const aiMesh* mesh);
+    std::vector<glm::mat4x4> calculateBoneMatrices(const aiMesh* mesh);
 private:
+    glm::mat4x4 getNodeTransform(const aiNode *node, double timeElapsed);
+    std::vector<AnimatedMesh> meshArray;
     std::map<std::string, aiNode*> nodesByName;
     std::map<std::string, aiNodeAnim*> channelsByName;
-    std::vector<AnimatedMesh> meshArray;
     Assimp::Importer importer;
     const aiScene *scene;
 }; // AnimatedModel
