@@ -127,7 +127,7 @@ void AnimatedModel::draw(const Graphics &graphics, double timeElapsed)
         std::vector<glm::mat4x4> boneMatrices = calculateBoneMatrices(currentMesh, timeElapsed);
         glUniformMatrix4fv(graphics.uniformBoneMatricesAnim, 64, GL_FALSE, (GLfloat*)&boneMatrices[0]);
         textureArray[currentMesh->mMaterialIndex].bind();
-        meshArray[i].draw(graphics);
+        meshArray[i].draw(graphics, timeElapsed);
     }
 }
 
@@ -265,7 +265,7 @@ glm::mat4x4 AnimatedModel::getNodeTransform(const aiNode *node, double timeElaps
     if(channelIterator == channelsByName.end())
     {
         // std::cerr << "No channel found for node: " << name << std::endl;
-        return glm::mat4x4();
+        return node->mParent ? getNodeTransform(node->mParent, timeElapsed) : glm::mat4x4();
     }
 
     const aiNodeAnim *currentChannel = channelIterator->second;
@@ -293,7 +293,6 @@ std::vector<glm::mat4x4> AnimatedModel::calculateBoneMatrices(const aiMesh* mesh
         const aiBone *currentBone = mesh->mBones[i];
         const std::string name(currentBone->mName.data);
         const aiNode *currentNode = nodesByName[name];
-
         const glm::mat4x4 boneTransform = getNodeTransform(currentNode, timeElapsed) * toMatrix(currentBone->mOffsetMatrix);
         boneMatrices[i] = boneTransform;
     }
@@ -432,7 +431,7 @@ bool AnimatedMesh::loadMesh(const aiMesh *mesh)
     return true;
 }
 
-void AnimatedMesh::draw(const Graphics &graphics)
+void AnimatedMesh::draw(const Graphics &graphics, double timeElapsed) const
 {
     glBindBuffer(GL_ARRAY_BUFFER, buffer[POSITION_BUFFER]);
     glVertexAttribPointer(graphics.attributePositionAnim, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);

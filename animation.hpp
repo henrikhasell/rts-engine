@@ -19,13 +19,82 @@ namespace Engine
 {
 namespace GL
 {
+
+class AnimatedModel;
+class AnimatedMesh;
+class Bone;
+class Node;
+class VectorKey;
+class QuatKey;
+class NodeAnimation;
+class Animation;
+
+class Bone
+{
+public:
+    Bone(const aiBone *bone);
+private:
+    std::string name;
+    glm::mat4x4 boneTransform;
+    std::vector<GLfloat> weights;
+};
+
+class Node
+{
+public:
+    Node(const aiNode *node);
+private:
+    std::string name;
+    std::vector<Node*> children;
+    Node *parent;
+};
+
+class VectorKey
+{
+public:
+    VectorKey(const aiVectorKey *vectorKey);
+private:
+    glm::vec3 position;
+    double time;
+};
+
+class QuatKey
+{
+public:
+    QuatKey(const aiQuatKey *quatKey);
+private:
+    glm::quat rotation;
+    double time;
+};
+
+class NodeAnimation
+{
+public:
+    NodeAnimation(const aiNodeAnim *nodeAnim);
+private:
+    std::string name;
+    std::vector<VectorKey> positionKeys;
+    std::vector<VectorKey> scalingKeys;
+    std::vector<QuatKey> rotationKeys;
+};
+
+class Animation
+{
+public:
+    Animation(const aiAnimation *animation);
+private:
+    std::string name;
+    std::vector<NodeAnimation> channels;
+    double duration;
+};
+
 class AnimatedMesh
 {
 public:
     AnimatedMesh();
     ~AnimatedMesh();
     bool loadMesh(const aiMesh *mesh);
-    void draw(const Graphics &graphics);
+    void draw(const Graphics &graphics, double timeElapsed) const;
 private:
     GLuint buffer[6];
     GLuint numberOfIndices;
