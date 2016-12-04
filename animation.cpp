@@ -1,4 +1,5 @@
 #include "animation.hpp"
+#include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 #include <assimp/vector3.h>
 #include <assimp/scene.h>
@@ -18,20 +19,27 @@ using namespace GL;
 #define BONE_WEIGHT_BUFFER 4
 #define INDEX_BUFFER 5
 
-AnimatedModel::AnimatedModel()
+AnimatedModel::AnimatedModel() : scene(nullptr)
 {
 
 }
 
 AnimatedModel::~AnimatedModel()
 {
-
+    if(scene)
+    {
+        aiReleaseImport(scene);
+    }
 }
 
 bool AnimatedModel::loadFile(const char path[])
 {
+    if(scene)
+    {
+        aiReleaseImport(scene);
+    }
 
-    scene = importer.ReadFile(path,
+    scene = aiImportFile(path,
         aiProcess_Triangulate      |
         aiProcess_GenSmoothNormals |
         aiProcess_GenUVCoords      |
@@ -40,6 +48,24 @@ bool AnimatedModel::loadFile(const char path[])
 
     if(scene)
     {
+        textureArray.resize(scene->mNumMaterials);
+
+        std::string pathString(path);
+        size_t last_index = pathString.find_last_of("/\\");
+        pathString = pathString.substr(0, last_index + 1);
+
+
+        for(unsigned int i = 0; i < scene->mNumMaterials; i++)
+        {
+            aiMaterial *currentMaterial = scene->mMaterials[i];
+
+            aiString texturePath;
+            aiGetMaterialTexture(currentMaterial, aiTextureType_DIFFUSE, 0, &texturePath, 0, 0, 0, 0, 0, 0);
+
+            const std::string fullTexturePath(pathString + texturePath.data);
+            textureArray[i].load(fullTexturePath.data());
+        }
+
         return loadScene(scene);
     }
 
@@ -71,26 +97,23 @@ bool AnimatedModel::loadScene(const aiScene *scene)
     for(unsigned int i = 0; i < currentAnimation->mNumChannels; i++)
     {
         aiNodeAnim *currentChannel = currentAnimation->mChannels[i];
-
         const std::string name(currentChannel->mNodeName.data);
-
-        std::cout << "Loading channel: " << name << std::endl;
-
         channelsByName[name] = currentChannel;
     }
 
     return scene->mNumMeshes != 0;
 }
 
-void AnimatedModel::draw(const Graphics &graphics)
+void AnimatedModel::draw(const Graphics &graphics, double timeElapsed)
 {
 
     for(unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
         aiMesh *currentMesh = scene->mMeshes[i];
 
-        std::vector<glm::mat4x4> boneMatrices = calculateBoneMatrices(currentMesh);
-        glUniformMatrix4fv(graphics.uniformBoneMatricesAnim, 60, GL_FALSE, (GLfloat*)&boneMatrices[0]);
+        std::vector<glm::mat4x4> boneMatrices = calculateBoneMatrices(currentMesh, timeElapsed);
+        glUniformMatrix4fv(graphics.uniformBoneMatricesAnim, 64, GL_FALSE, (GLfloat*)&boneMatrices[0]);
+        textureArray[currentMesh->mMaterialIndex].bind();
         meshArray[i].draw(graphics);
     }
 }
@@ -244,11 +267,9 @@ glm::mat4x4 AnimatedModel::getNodeTransform(const aiNode *node, double timeElaps
     return channelTransform;
 }
 
-std::vector<glm::mat4x4> AnimatedModel::calculateBoneMatrices(const aiMesh* mesh)
+std::vector<glm::mat4x4> AnimatedModel::calculateBoneMatrices(const aiMesh* mesh, double timeElapsed)
 {
-    std::vector<glm::mat4x4> boneMatrices(mesh->mNumBones);
-
-    static double timeElapsed = 0.0f;
+    std::vector<glm::mat4x4> boneMatrices(64);
 
     for(unsigned int i = 0; i < mesh->mNumBones; i++)
     {
@@ -259,8 +280,6 @@ std::vector<glm::mat4x4> AnimatedModel::calculateBoneMatrices(const aiMesh* mesh
         const glm::mat4x4 boneTransform = getNodeTransform(currentNode, timeElapsed) * toMatrix(currentBone->mOffsetMatrix);
         boneMatrices[i] = boneTransform;
     }
-
-    timeElapsed += 0.1;
 
     return boneMatrices;
 }
@@ -358,10 +377,10 @@ bool AnimatedMesh::loadMesh(const aiMesh *mesh)
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[NORMAL_BUFFER]);
     glBufferData(GL_ARRAY_BUFFER, normalArray.size() * sizeof(glm::vec3), normalArray.data(), GL_STATIC_DRAW);
-/*
+
     glBindBuffer(GL_ARRAY_BUFFER, buffer[TEXCOORD_BUFFER]);
     glBufferData(GL_ARRAY_BUFFER, textureCoordArray.size() * sizeof(glm::vec2), textureCoordArray.data(), GL_STATIC_DRAW);
-*/
+
     glBindBuffer(GL_ARRAY_BUFFER, buffer[BONE_INDEX_BUFFER]);
     glBufferData(GL_ARRAY_BUFFER, boneIndexArray.size() * sizeof(glm::uvec4), boneIndexArray.data(), GL_STATIC_DRAW);
 
@@ -383,10 +402,10 @@ void AnimatedMesh::draw(const Graphics &graphics)
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[NORMAL_BUFFER]);
     glVertexAttribPointer(graphics.attributeNormalAnim, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-/*
+
     glBindBuffer(GL_ARRAY_BUFFER, buffer[TEXCOORD_BUFFER]);
     glVertexAttribPointer(graphics.attributeTexCoordAnim, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
-*/
+
     glBindBuffer(GL_ARRAY_BUFFER, buffer[BONE_INDEX_BUFFER]);
     glVertexAttribPointer(graphics.attributeBoneIndicesAnim, 4, GL_UNSIGNED_INT, GL_FALSE, 0, (void*)0);
 

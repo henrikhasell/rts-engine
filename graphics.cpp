@@ -54,26 +54,6 @@ bool Graphics::initialise()
 
     if(result)
     {
-/*
-        glUseProgram(program3D.program);
-
-        glUniformMatrix4fv(uniformP3D, 1, GL_FALSE, &matrixP3D[0][0]);
-        glUniformMatrix4fv(uniformV3D, 1, GL_FALSE, &matrixV3D[0][0]);
-        glUniformMatrix4fv(uniformM3D, 1, GL_FALSE, &matrixM3D[0][0]);
-
-        glUseProgram(program2D.program);
-
-        glUniform1i(uniformTextureSampler2D, 0);
-        glUniformMatrix4fv(uniformP2D, 1, GL_FALSE, &matrixP2D[0][0]);
-        glUniformMatrix4fv(uniformV2D, 1, GL_FALSE, &matrixV2D[0][0]);
-        glUniformMatrix4fv(uniformM2D, 1, GL_FALSE, &matrixM2D[0][0]);
-
-        glUseProgram(programAnim.program);
-
-        glUniformMatrix4fv(uniformPAnim, 1, GL_FALSE, &matrixPAnim[0][0]);
-        glUniformMatrix4fv(uniformVAnim, 1, GL_FALSE, &matrixVAnim[0][0]);
-        glUniformMatrix4fv(uniformMAnim, 1, GL_FALSE, &matrixMAnim[0][0]);
-*/
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
 
@@ -202,7 +182,7 @@ void Graphics::getAttribsAnim()
 {
     attributePositionAnim = glGetAttribLocation(programAnim.program, "in_Position");
     attributeNormalAnim = glGetAttribLocation(programAnim.program, "in_Normal");
-    // attributeTexCoordAnim = glGetAttribLocation(programAnim.program, "in_TexCoord");
+    attributeTexCoordAnim = glGetAttribLocation(programAnim.program, "in_TexCoord");
     attributeBoneWeightsAnim = glGetAttribLocation(programAnim.program, "in_BoneWeights");
     attributeBoneIndicesAnim = glGetAttribLocation(programAnim.program, "in_BoneIndices");
 }
@@ -212,7 +192,6 @@ void Graphics::getUniforms2D()
     uniformP2D = glGetUniformLocation(program2D.program, "projectionMatrix");
     uniformV2D = glGetUniformLocation(program2D.program, "viewMatrix");
     uniformM2D = glGetUniformLocation(program2D.program, "modelMatrix");
-    uniformTextureSampler2D = glGetUniformLocation(program2D.program, "textureSampler");
 }
 
 void Graphics::getUniforms3D()
@@ -258,7 +237,7 @@ void Graphics::beginAnim()
 
     glEnableVertexAttribArray(attributePositionAnim);
     glEnableVertexAttribArray(attributeNormalAnim);
-    //glEnableVertexAttribArray(attributeTexCoordAnim);
+    glEnableVertexAttribArray(attributeTexCoordAnim);
     glEnableVertexAttribArray(attributeBoneWeightsAnim);
     glEnableVertexAttribArray(attributeBoneIndicesAnim);
 
@@ -286,7 +265,7 @@ void Graphics::endAnim()
 
     glDisableVertexAttribArray(attributePositionAnim);
     glDisableVertexAttribArray(attributeNormalAnim);
-    //glDisableVertexAttribArray(attributeTexCoordAnim);
+    glDisableVertexAttribArray(attributeTexCoordAnim);
     glDisableVertexAttribArray(attributeBoneWeightsAnim);
     glDisableVertexAttribArray(attributeBoneIndicesAnim);
 }

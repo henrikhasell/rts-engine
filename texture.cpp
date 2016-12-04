@@ -1,5 +1,6 @@
 #include "texture.hpp"
 #include <iostream>
+#include <SDL2/SDL_image.h>
 
 using namespace Engine;
 using namespace GL;
@@ -26,20 +27,23 @@ Texture::~Texture()
 #   define A_MASK 0xFF000000
 #endif // SDL_BYTEORDER
 
-/* Test code:
+bool Texture::load(const char path[])
+{
+    bool result = false;
 
-    float pixels[] = {
-        0.0f, 0.0f, 0.0f,   1.0f, 1.0f, 1.0f,
-        1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 0.0f
-    };
+    SDL_Surface *surface = IMG_Load(path);
 
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    if(surface)
+    {
+        result = load(surface);
+    }
 
-    return true;
-*/
+    SDL_FreeSurface(surface);
+
+    std::cout << "Loading " << path << ": " << result << std::endl;
+
+    return result;
+}
 
 bool Texture::load(SDL_Surface *surface)
 {
@@ -50,7 +54,21 @@ bool Texture::load(SDL_Surface *surface)
         SDL_BlitSurface(surface, NULL, optimised, NULL);
 
         glBindTexture(GL_TEXTURE_2D, texture);
+/*
+        GLubyte pixels[] = {
+            0xff, 0xff, 0xff, 0xff,   0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff,   0xff, 0xff, 0xff, 0xff
+        };
+        glTexImage2D(GL_TEXTURE_2D, 0, 4,
+            2,
+            2, 0,
+            GL_RGBA, GL_UNSIGNED_BYTE,
+            pixels
+        );
 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+*/
         glTexImage2D(GL_TEXTURE_2D, 0, 4,
             optimised->w,
             optimised->h, 0,

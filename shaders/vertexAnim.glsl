@@ -12,7 +12,7 @@ out vec2 ex_TexCoord;
 uniform mat4 projectionMatrix;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
-uniform mat4 boneMatrices[60];
+uniform mat4 boneMatrices[64];
 
 void main()
 {

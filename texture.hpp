@@ -13,6 +13,7 @@ class Texture
     public:
         Texture();
         ~Texture();
+        bool load(const char path[]);
         bool load(SDL_Surface *surface);
         void bind() const;
     private:

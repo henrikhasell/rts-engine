@@ -78,7 +78,6 @@ private:
     GLint uniformP2D;
     GLint uniformV2D;
     GLint uniformM2D;
-    GLint uniformTextureSampler2D;
     // Anim Uniforms:
     GLint uniformPAnim;
     GLint uniformVAnim;
