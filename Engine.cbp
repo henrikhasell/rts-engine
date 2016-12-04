@@ -40,6 +40,7 @@
 			<Add library="assimp" />
 			<Add library="SDL2" />
 			<Add library="SDL2_ttf" />
+			<Add library="SDL2_image" />
 			<Add library="GLEW" />
 			<Add library="GL" />
 			<Add library="GLU" />

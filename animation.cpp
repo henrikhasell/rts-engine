@@ -32,6 +32,11 @@ AnimatedModel::~AnimatedModel()
     }
 }
 
+void AnimatedModel::setTexture(size_t index, const char path[])
+{
+    textureArray[index].load(path);
+}
+
 bool AnimatedModel::loadFile(const char path[])
 {
     if(scene)
@@ -92,13 +97,16 @@ bool AnimatedModel::loadScene(const aiScene *scene)
         }
     }
 
-    aiAnimation *currentAnimation = scene->mAnimations[0];
-
-    for(unsigned int i = 0; i < currentAnimation->mNumChannels; i++)
+    if(scene->HasAnimations() == true)
     {
-        aiNodeAnim *currentChannel = currentAnimation->mChannels[i];
-        const std::string name(currentChannel->mNodeName.data);
-        channelsByName[name] = currentChannel;
+        aiAnimation *currentAnimation = scene->mAnimations[0];
+
+        for(unsigned int i = 0; i < currentAnimation->mNumChannels; i++)
+        {
+            aiNodeAnim *currentChannel = currentAnimation->mChannels[i];
+            const std::string name(currentChannel->mNodeName.data);
+            channelsByName[name] = currentChannel;
+        }
     }
 
     return scene->mNumMeshes != 0;
@@ -110,6 +118,11 @@ void AnimatedModel::draw(const Graphics &graphics, double timeElapsed)
     for(unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
         aiMesh *currentMesh = scene->mMeshes[i];
+
+        if(strcmp("Bounds", currentMesh->mName.data) == 0)
+        {
+            continue;
+        }
 
         std::vector<glm::mat4x4> boneMatrices = calculateBoneMatrices(currentMesh, timeElapsed);
         glUniformMatrix4fv(graphics.uniformBoneMatricesAnim, 64, GL_FALSE, (GLfloat*)&boneMatrices[0]);
@@ -311,13 +324,23 @@ bool AnimatedMesh::loadMesh(const aiMesh *mesh)
 
     for(unsigned int j = 0; j < mesh->mNumVertices; j++)
     {
-        const aiVector3D *currentPosition = mesh->mVertices + j;
-        const aiVector3D *currentNormal = mesh->mNormals + j;
-        const aiVector3D *currentTextureCoord = *mesh->mTextureCoords + j;
+        if(mesh->HasPositions() == true)
+        {
+            const aiVector3D *currentPosition = mesh->mVertices + j;
+            positionArray[j] = glm::vec3(currentPosition->x, currentPosition->y, currentPosition->z);
+        }
 
-        positionArray[j] = glm::vec3(currentPosition->x, currentPosition->y, currentPosition->z);
-        normalArray[j] = glm::vec3(currentNormal->x, currentNormal->y, currentNormal->z);
-        textureCoordArray[j] = glm::vec2(currentTextureCoord->x, 1.0f - currentTextureCoord->y);
+        if(mesh->HasNormals() == true)
+        {
+            const aiVector3D *currentNormal = mesh->mNormals + j;
+            normalArray[j] = glm::vec3(currentNormal->x, currentNormal->y, currentNormal->z);
+        }
+
+        if(mesh->HasTextureCoords(0) == true)
+        {
+            const aiVector3D *currentTextureCoord = *mesh->mTextureCoords + j;
+            textureCoordArray[j] = glm::vec2(currentTextureCoord->x, 1.0f - currentTextureCoord->y);
+        }
     }
 
     for(unsigned int j = 0; j < mesh->mNumFaces; j++)
@@ -357,7 +380,12 @@ bool AnimatedMesh::loadMesh(const aiMesh *mesh)
 
         boneIndexArray[j] = glm::uvec4(0, 0, 0, 0);
 
-        for(size_t k = 0; k < indexArray.size(); k++)
+        if(indexArray.size() > 4)
+        {
+            std::cerr << "Warning: More than 4 bone indices per vertex." << std::endl;
+        }
+
+        for(size_t k = 0; k < indexArray.size() && k < 4; k++)
         {
             boneIndexArray[j][k] = indexArray[k];
         }
@@ -366,7 +394,12 @@ bool AnimatedMesh::loadMesh(const aiMesh *mesh)
 
         boneWeightArray[j] = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-        for(size_t k = 0; k < weightArray.size(); k++)
+        if(weightArray.size() > 4)
+        {
+            std::cerr << "Warning: More than 4 bone indices per vertex." << std::endl;
+        }
+
+        for(size_t k = 0; k < weightArray.size() && k < 4; k++)
         {
             boneWeightArray[j][k] = weightArray[k];
         }

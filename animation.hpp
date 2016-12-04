@@ -39,6 +39,7 @@ public:
     bool loadScene(const aiScene *scene);
     bool loadFile(const char path[]);
     void draw(const Graphics &graphics, double timeElapsed);
+    void setTexture(size_t index, const char path[]);
 private:
     std::vector<glm::mat4x4> calculateBoneMatrices(const aiMesh* mesh, double timeElapsed);
     glm::mat4x4 getNodeTransform(const aiNode *node, double timeElapsed);

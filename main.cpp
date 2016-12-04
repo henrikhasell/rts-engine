@@ -91,7 +91,6 @@ int main (void)
                                 Engine::GL::AnimatedModel animatedModel;
                                 animatedModel.loadFile("models/dwarf/dwarf.x");
 
-
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;
                                 }
