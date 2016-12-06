@@ -164,16 +164,12 @@ static glm::vec3 interpolatePosition(const aiAnimation *animation, const aiNodeA
 
     unsigned int currentFrame = 0;
 
-    while(currentFrame < channel->mNumPositionKeys - 1)
+    while(currentTime > channel->mPositionKeys[currentFrame + 1].mTime)
     {
-        if(currentTime < channel->mPositionKeys[currentFrame + 1].mTime)
-        {
-            break;
-        }
         currentFrame++;
     }
 
-    unsigned int nextFrame = (currentFrame + 1) >= channel->mNumPositionKeys ? 0 : (currentFrame + 1);
+    const unsigned int nextFrame = (currentFrame + 1) % channel->mNumPositionKeys;
 
     const aiVectorKey &currentKey = channel->mPositionKeys[currentFrame];
     const aiVectorKey &nextKey = channel->mPositionKeys[nextFrame];
@@ -185,8 +181,7 @@ static glm::vec3 interpolatePosition(const aiAnimation *animation, const aiNodeA
         timeDifference += animation->mDuration;
     }
 
-    const double interpolationFactor = timeDifference != 0.0
-    ? (currentTime - currentKey.mTime) / timeDifference : 0.0;
+    const double interpolationFactor = (currentTime - currentKey.mTime) / timeDifference;
 
     return toVec3(currentKey.mValue) + toVec3(nextKey.mValue - currentKey.mValue) * (float)interpolationFactor;
 }
