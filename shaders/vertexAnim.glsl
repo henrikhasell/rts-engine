@@ -31,4 +31,4 @@ void main()
     gl_Position = projectionMatrix * viewMatrix * modelMatrix * modified_Position;
     ex_Normal = (modelMatrix * modified_Normal).xyz;
     ex_TexCoord = in_TexCoord;
-};
+}
