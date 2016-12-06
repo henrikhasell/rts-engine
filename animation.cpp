@@ -259,7 +259,16 @@ static glm::vec3 interpolateScale(const aiAnimation *animation, const aiNodeAnim
 glm::mat4x4 AnimatedModel::getNodeTransform(const aiNode *node, double timeElapsed)
 {
     const std::string name(node->mName.data);
-    const aiNodeAnim *currentChannel = channelsByName[name];
+
+    std::map<std::string, aiNodeAnim*>::iterator channelIterator = channelsByName.find(name);
+
+    if(channelIterator == channelsByName.end())
+    {
+        // std::cerr << "No channel found for node: " << name << std::endl;
+        return glm::mat4x4();
+    }
+
+    const aiNodeAnim *currentChannel = channelIterator->second;
 
     const glm::mat4x4 channelRotation = interpolateRotation(scene->mAnimations[0], currentChannel, timeElapsed);
     const glm::mat4x4 channelScale = glm::scale(glm::mat4x4(), interpolateScale(scene->mAnimations[0], currentChannel, timeElapsed));
@@ -279,7 +288,7 @@ std::vector<glm::mat4x4> AnimatedModel::calculateBoneMatrices(const aiMesh* mesh
 {
     std::vector<glm::mat4x4> boneMatrices(64);
 
-    for(unsigned int i = 0; i < mesh->mNumBones; i++)
+    for(unsigned int i = 0; i < mesh->mNumBones && i < 64; i++)
     {
         const aiBone *currentBone = mesh->mBones[i];
         const std::string name(currentBone->mName.data);

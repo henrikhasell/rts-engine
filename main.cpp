@@ -47,9 +47,9 @@ int main (void)
                 SDL_Window *window = SDL_CreateWindow(PROJECT_NAME,
                     SDL_WINDOWPOS_UNDEFINED,
                     SDL_WINDOWPOS_UNDEFINED,
-                    displayMode.w,
-                    displayMode.h,
-                    SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_INPUT_GRABBED
+                    400,//displayMode.w,
+                    300,//displayMode.h,
+                    SDL_WINDOW_OPENGL /* | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_INPUT_GRABBED */
                 );
 
                 if(window != nullptr)
@@ -89,7 +89,8 @@ int main (void)
 
 
                                 Engine::GL::AnimatedModel animatedModel;
-                                animatedModel.loadFile("models/dwarf/dwarf.x");
+                                animatedModel.loadFile("models/ninja/ninja.dae");
+                                animatedModel.setTexture(0,"models/ninja/nskingr.jpg");
 
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;
@@ -160,7 +161,7 @@ int main (void)
                                     //graphics.end3D();
 
                                     graphics.beginAnim();
-                                        animatedModel.draw(graphics, (double)SDL_GetTicks() / 100.0);
+                                        animatedModel.draw(graphics, (double)SDL_GetTicks() / 10000.0);
                                     graphics.endAnim();
 
 
