@@ -16,14 +16,14 @@ Console::~Console()
 void Console::appendOutput(const Font &font, const char output[])
 {
     // Add a new mesh to the output array:
-    outputMesh.emplace_back();
+    outputText.emplace_back();
     // Initialise the text within the mesh:
-    font.renderString(outputMesh.back(), output);
+    //font.renderString(outputMesh.back(), output);
     // Arbitrarily limit the length of the output list:
-    if(outputMesh.size() > 20)
+    if(outputText.size() > 20)
     {
         // Remove the head of the output list:
-        outputMesh.pop_front();
+        outputText.pop_front();
     }
 }
 
@@ -35,7 +35,7 @@ void Console::appendInput(const Font &font, const char input[])
         // Append the input to the string buffer:
         inputString += input;
         // Update the graphical mesh:
-        font.renderString(inputMesh, inputString.data());
+        inputText.setText(font, inputString.data());
     }
 }
 
@@ -80,7 +80,7 @@ void Console::backspace(const Font &font)
         // Update the graphical mesh (if appropriate):
         if(inputString.length() > 0)
         {
-            font.renderString(inputMesh, inputString.data());
+            inputText.setText(font, inputString.data());
         }
     }
 }
@@ -90,10 +90,10 @@ void Console::draw(const Graphics &graphics)
     // Arbitrary offset:
     glm::vec2 offset(0.0f, FONT_SIZE * 2.0f);
 
-    for(Engine::GL::Mesh2D &mesh : outputMesh)
+    for(TextField &field : outputText)
     {
         // Render one lone line of output:
-        mesh.draw(graphics, offset);
+        field.draw(graphics, offset);
         // Increment the offset by line height:
         offset.y += FONT_SIZE;
     }
@@ -101,6 +101,6 @@ void Console::draw(const Graphics &graphics)
     if(inputString.empty() == false)
     {
         // Only render the input string if not empty:
-        inputMesh.draw(graphics, offset);
+        inputText.draw(graphics, offset);
     }
 }

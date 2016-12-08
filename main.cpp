@@ -20,6 +20,7 @@
 #include "mesh2d.hpp"
 #include "scene.hpp"
 #include "font.hpp"
+#include "textfield.hpp"
 
 #define PROJECT_NAME "Shitty game engine."
 #define SCREEN_WIDTH 1280
@@ -81,9 +82,8 @@ int main (void)
 
                                 std::cout << "Successfully initialised the graphics sub-system." << std::endl;
 
-                                Engine::GL::Mesh2D text;
                                 Engine::GL::Font font;
-
+                                Engine::GL::TextField textField;
                                 Engine::GL::Model3D teapotModel;
                                 Engine::GL::Console console;
 
@@ -112,10 +112,12 @@ int main (void)
                                     std::cout << "Successfully loaded font!" << std::endl;
                                 }
 
+                                textField.setText(font, "Hello, world!");
+/*
                                 if(font.renderString(text, "Hello, world!") == true) {
                                     std::cout << "Successfully created text mesh!" << std::endl;
                                 }
-
+*/
                                 if(teapotModel.loadFile("models/teapot.obj") == true) {
                                     std::cout << "Successfully loaded teapot!" << std::endl;
                                 }
@@ -184,7 +186,7 @@ int main (void)
 
 
                                     graphics.begin2D();
-                                        text.draw(graphics);
+                                        textField.draw(graphics);
                                         console.draw(graphics);
                                     graphics.end2D();
 

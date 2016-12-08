@@ -16,7 +16,7 @@ class Font
         Font();
         ~Font();
         bool load(const char path[]);
-        bool renderString(Mesh2D &mesh, const char string[]) const;
+        bool renderString(Mesh2D &mesh, Texture &texture, const char string[]) const;
     private:
         TTF_Font *font;
 }; // Font

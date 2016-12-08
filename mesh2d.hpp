@@ -15,20 +15,17 @@ namespace GL
 class Mesh2D
 {
 public:
+    static Mesh2D createRectangle(float width, float height);
     Mesh2D();
     ~Mesh2D();
     void setVertices(const std::vector<glm::vec2> &vertexArray);
     void setTextureCoordinates(const std::vector<glm::vec2> &uvArray);
     void setIndices(const std::vector<GLuint> &indexArray);
-    void setTexture(SDL_Surface *surface);
-    void draw(const Graphics &graphics, const glm::vec2 &position);
-    void draw(const Graphics &graphics);
+    void draw(const Graphics &graphics, const glm::vec2 &position) const;
+    void draw(const Graphics &graphics) const;
 private:
-    Texture texture;
-    std::vector<glm::vec2> vertexArray;
-    std::vector<glm::vec2> uvArray;
-    std::vector<GLuint> indexArray;
     GLuint buffer[3];
+    GLuint numberOfIndices;
 }; // Mesh2D
 }; // GL
 }; // Engine

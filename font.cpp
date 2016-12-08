@@ -26,7 +26,7 @@ bool Font::load(const char path[])
     return font != nullptr;
 }
 
-bool Font::renderString(Mesh2D &mesh, const char string[]) const
+bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[]) const
 {
     SDL_Color white = {255, 255, 255};
 
@@ -50,7 +50,7 @@ bool Font::renderString(Mesh2D &mesh, const char string[]) const
         mesh.setVertices(vertexArray);
         mesh.setTextureCoordinates(uvArray);
         mesh.setIndices(indexArray);
-        mesh.setTexture(surface);
+        texture.load(surface);
 
         SDL_FreeSurface(surface);
     }

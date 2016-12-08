@@ -3,7 +3,7 @@
 
 #include <list>
 #include <lua5.2/lua.hpp>
-#include "mesh2d.hpp"
+#include "textfield.hpp"
 #include "font.hpp"
 
 namespace Engine
@@ -22,8 +22,8 @@ public:
     void backspace(const Font &font);
     void draw(const Graphics &graphics);
 protected:
-    std::list<Engine::GL::Mesh2D> outputMesh;
-    Engine::GL::Mesh2D inputMesh;
+    std::list<TextField> outputText;
+    TextField inputText;
     std::string inputString;
 }; // Console
 }; // GL
