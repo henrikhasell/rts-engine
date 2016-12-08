@@ -91,14 +91,22 @@ int main (void)
 
                                 Engine::GL::AnimatedModel animatedModel;
                                 animatedModel.loadFile("models/ninja/ninja.b3d");
-                                animatedModel.setTexture(0,"models/ninja/nskingr.jpg");
+                                animatedModel.setTexture(0,"models/ninja/nskinrd.jpg");
                                 animatedModel.addAnimationRange("walk", 1, 14);
                                 animatedModel.addAnimationRange("stealth walk", 15, 30);
                                 animatedModel.addAnimationRange("jump", 94, 102);
                                 animatedModel.addAnimationRange("attack1", 32, 44);
                                 animatedModel.addAnimationRange("idle1", 184, 205);
+                                animatedModel.addAnimationRange("idle2", 206, 250);
+                                animatedModel.addAnimationRange("idle3", 251, 300);
+                                animatedModel.addAnimationRange("backflip", 146, 158);
+                                animatedModel.addAnimationRange("climb", 159, 165);
+                                animatedModel.addAnimationRange("death1", 166, 173);
+                                animatedModel.addAnimationRange("death2", 174, 182);
+                                animatedModel.addAnimationRange("kick", 73, 83);
 
-                                animatedModel.setAnimationRange("idle1");
+
+                                animatedModel.setAnimationRange("attack1");
 
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;
@@ -113,6 +121,8 @@ int main (void)
                                 }
 
                                 Uint32 timeStep = 0;
+
+                                std::cout << "Initialisation time: " << SDL_GetTicks() << std::endl;
 
                                 while(!finished)
                                 {
@@ -140,7 +150,7 @@ int main (void)
                                                 }
                                                 if(event.key.keysym.scancode == SDL_SCANCODE_RETURN)
                                                 {
-                                                    // TODO
+
                                                 }
                                             }
                                             else if(event.type == SDL_TEXTINPUT)
@@ -169,7 +179,7 @@ int main (void)
                                     //graphics.end3D();
 
                                     graphics.beginAnim();
-                                        animatedModel.draw(graphics, (double)SDL_GetTicks() / 1000.0);
+                                        animatedModel.draw(graphics, (double)SDL_GetTicks() / 100.0);
                                     graphics.endAnim();
 
 
