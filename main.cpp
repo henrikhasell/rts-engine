@@ -91,7 +91,7 @@ int main (void)
 
                                 Engine::GL::AnimatedModel animatedModel;
                                 animatedModel.loadFile("models/ninja/ninja.b3d");
-                                animatedModel.setTexture(0,"models/ninja/nskinrd.jpg");
+                                animatedModel.setTexture(0,"models/ninja/nskinbl.jpg");
                                 animatedModel.addAnimationRange("walk", 1, 14);
                                 animatedModel.addAnimationRange("stealth walk", 15, 30);
                                 animatedModel.addAnimationRange("jump", 94, 102);
@@ -106,7 +106,7 @@ int main (void)
                                 animatedModel.addAnimationRange("kick", 73, 83);
 
 
-                                animatedModel.setAnimationRange("attack1");
+                                animatedModel.setAnimationRange("idle3");
 
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;

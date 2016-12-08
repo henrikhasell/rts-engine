@@ -197,7 +197,7 @@ static glm::vec3 interpolatePosition(const aiAnimation *animation, const aiNodeA
 
     unsigned int minimumFrame = 0;
 
-    while(minimumFrame < channel->mNumPositionKeys - 1 && minimumTime > channel->mPositionKeys[minimumFrame + 1].mTime)
+    while(minimumTime >= channel->mPositionKeys[minimumFrame + 1].mTime)
     {
         minimumFrame++;
     }
@@ -206,7 +206,7 @@ static glm::vec3 interpolatePosition(const aiAnimation *animation, const aiNodeA
 
     unsigned int maximumFrame = minimumFrame;
 
-    while(maximumFrame < channel->mNumPositionKeys - 1 && maximumTime > channel->mPositionKeys[maximumFrame + 1].mTime)
+    while(maximumTime >= channel->mPositionKeys[maximumFrame + 1].mTime)
     {
         maximumFrame++;
     }
@@ -215,7 +215,7 @@ static glm::vec3 interpolatePosition(const aiAnimation *animation, const aiNodeA
 
     unsigned int currentFrame = minimumFrame;
 
-    while(currentFrame < channel->mNumPositionKeys - 1 && currentTime > channel->mPositionKeys[currentFrame + 1].mTime)
+    while(currentTime >= channel->mPositionKeys[currentFrame + 1].mTime)
     {
         currentFrame++;
     }
@@ -227,7 +227,7 @@ static glm::vec3 interpolatePosition(const aiAnimation *animation, const aiNodeA
 
     double timeDifference = nextKey.mTime - currentKey.mTime;
     if(timeDifference < 0)
-        timeDifference += maximumTime - minimumTime;
+        timeDifference += maximumTime ;
 
     const double interpolationFactor = timeDifference ? (currentTime - currentKey.mTime) / timeDifference : 0.0f;
 
@@ -238,7 +238,7 @@ static glm::mat4x4 interpolateRotation(const aiAnimation *animation, const aiNod
 {
     unsigned int minimumFrame = 0;
 
-    while(minimumFrame < channel->mNumRotationKeys - 1 && minimumTime > channel->mRotationKeys[minimumFrame + 1].mTime)
+    while(minimumTime >= channel->mRotationKeys[minimumFrame + 1].mTime)
     {
         minimumFrame++;
     }
@@ -247,7 +247,7 @@ static glm::mat4x4 interpolateRotation(const aiAnimation *animation, const aiNod
 
     unsigned int maximumFrame = minimumFrame;
 
-    while(maximumFrame < channel->mNumRotationKeys - 1 && maximumTime > channel->mRotationKeys[maximumFrame + 1].mTime)
+    while(maximumTime >= channel->mRotationKeys[maximumFrame + 1].mTime)
     {
         maximumFrame++;
     }
@@ -256,7 +256,7 @@ static glm::mat4x4 interpolateRotation(const aiAnimation *animation, const aiNod
 
     unsigned int currentFrame = minimumFrame;
 
-    while(currentFrame < channel->mNumRotationKeys - 1 && currentTime > channel->mRotationKeys[currentFrame + 1].mTime)
+    while(currentTime >= channel->mRotationKeys[currentFrame + 1].mTime)
     {
         currentFrame++;
     }
@@ -268,7 +268,7 @@ static glm::mat4x4 interpolateRotation(const aiAnimation *animation, const aiNod
 
     double timeDifference = nextKey.mTime - currentKey.mTime;
     if(timeDifference < 0)
-        timeDifference += maximumTime - minimumTime;
+        timeDifference += maximumTime;
 
     const double interpolationFactor = timeDifference ? (currentTime - currentKey.mTime) / timeDifference : 0.0f;
 
@@ -284,34 +284,39 @@ static glm::mat4x4 interpolateRotation(const aiAnimation *animation, const aiNod
 
 static glm::vec3 interpolateScale(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime, double minimumTime, double maximumTime)
 {
-
     unsigned int minimumFrame = 0;
 
-    while(minimumFrame < channel->mNumScalingKeys - 1 && minimumTime > channel->mScalingKeys[minimumFrame + 1].mTime)
+    while(minimumFrame < channel->mNumScalingKeys - 1 && minimumTime >= channel->mScalingKeys[minimumFrame + 1].mTime)
     {
         minimumFrame++;
     }
 
     currentTime = minimumTime + fmod(currentTime, maximumTime - minimumTime);
 
+    unsigned int maximumFrame = minimumFrame;
+
+    while(minimumFrame < channel->mNumScalingKeys - 1 && maximumTime >= channel->mScalingKeys[maximumFrame + 1].mTime)
+    {
+        maximumFrame++;
+    }
+
+    currentTime = minimumTime + fmod(currentTime, maximumTime - minimumTime);
+
     unsigned int currentFrame = minimumFrame;
 
-    while(currentFrame < channel->mNumScalingKeys - 1 && currentTime > channel->mScalingKeys[currentFrame + 1].mTime)
+    while(minimumFrame < channel->mNumScalingKeys - 1 && currentTime >= channel->mScalingKeys[currentFrame + 1].mTime)
     {
         currentFrame++;
     }
 
-    const unsigned int nextFrame = channel->mScalingKeys[currentFrame + 1].mTime < maximumTime ? (currentFrame + 1) : minimumFrame;
+    const unsigned int nextFrame = currentFrame == maximumFrame ? minimumFrame : currentFrame + 1;
 
     const aiVectorKey &currentKey = channel->mScalingKeys[currentFrame];
     const aiVectorKey &nextKey = channel->mScalingKeys[nextFrame];
 
     double timeDifference = nextKey.mTime - currentKey.mTime;
-
     if(timeDifference < 0)
-    {
-        timeDifference += animation->mDuration;
-    }
+        timeDifference += maximumTime ;
 
     const double interpolationFactor = timeDifference ? (currentTime - currentKey.mTime) / timeDifference : 0.0f;
 
@@ -336,7 +341,7 @@ glm::mat4x4 AnimatedModel::getNodeTransform(const aiNode *node, double timeElaps
     const glm::mat4x4 channelScale = glm::scale(glm::mat4x4(), interpolateScale(scene->mAnimations[0], currentChannel, timeElapsed, animationRange->first, animationRange->second));
     const glm::mat4x4 channelPosition = glm::translate(glm::mat4x4(), interpolatePosition(scene->mAnimations[0], currentChannel, timeElapsed, animationRange->first, animationRange->second)/*toVec3(currentChannel->mPositionKeys[0].mValue)*/);
 
-    const glm::mat4x4 channelTransform = channelPosition * channelRotation /* * channelScale*/;
+    const glm::mat4x4 channelTransform = channelPosition * channelRotation * channelScale;
 
     if(node->mParent)
     {
