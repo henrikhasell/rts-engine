@@ -47,9 +47,9 @@ int main (void)
                 SDL_Window *window = SDL_CreateWindow(PROJECT_NAME,
                     SDL_WINDOWPOS_UNDEFINED,
                     SDL_WINDOWPOS_UNDEFINED,
-                    400,//displayMode.w,
-                    300,//displayMode.h,
-                    SDL_WINDOW_OPENGL /* | SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_INPUT_GRABBED */
+                    800,//displayMode.w,
+                    600,//displayMode.h,
+                    SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_INPUT_GRABBED*/
                 );
 
                 if(window != nullptr)
@@ -88,9 +88,17 @@ int main (void)
                                 Engine::GL::Console console;
 
 
+
                                 Engine::GL::AnimatedModel animatedModel;
-                                animatedModel.loadFile("models/ninja/ninja.dae");
+                                animatedModel.loadFile("models/ninja/ninja.b3d");
                                 animatedModel.setTexture(0,"models/ninja/nskingr.jpg");
+                                animatedModel.addAnimationRange("walk", 1, 14);
+                                animatedModel.addAnimationRange("stealth walk", 15, 30);
+                                animatedModel.addAnimationRange("jump", 94, 102);
+                                animatedModel.addAnimationRange("attack1", 32, 44);
+                                animatedModel.addAnimationRange("idle1", 184, 205);
+
+                                animatedModel.setAnimationRange("idle1");
 
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;
@@ -161,7 +169,7 @@ int main (void)
                                     //graphics.end3D();
 
                                     graphics.beginAnim();
-                                        animatedModel.draw(graphics, (double)SDL_GetTicks() / 10000.0);
+                                        animatedModel.draw(graphics, (double)SDL_GetTicks() / 1000.0);
                                     graphics.endAnim();
 
 

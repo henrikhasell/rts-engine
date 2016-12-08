@@ -7,6 +7,7 @@
 #include <glm/detail/func_matrix.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <iterator>
 #include <map>
 
 using namespace Engine;
@@ -19,7 +20,7 @@ using namespace GL;
 #define BONE_WEIGHT_BUFFER 4
 #define INDEX_BUFFER 5
 
-AnimatedModel::AnimatedModel() : scene(nullptr)
+AnimatedModel::AnimatedModel() : animationRange(nullptr), scene(nullptr)
 {
 
 }
@@ -31,6 +32,29 @@ AnimatedModel::~AnimatedModel()
         aiReleaseImport(scene);
     }
 }
+
+    bool AnimatedModel::setAnimationRange(const char name[])
+    {
+        const std::string animationName(name);
+
+        std::map<std::string, std::pair<double, double>>::iterator i = animationRanges.find(animationName);
+        bool result = i != animationRanges.end();
+
+        if(result)
+        {
+            animationRange = &(*i).second;
+        }
+        else
+        {
+            std::cerr << "Cannot find animation " << animationName << std::endl;
+        }
+
+        return result;
+    }
+    void AnimatedModel::addAnimationRange(const char name[], double start, double finish)
+    {
+        animationRanges[std::string(name)] = std::pair<double, double>(start, finish);
+    }
 
 void AnimatedModel::setTexture(size_t index, const char path[])
 {
@@ -114,6 +138,16 @@ bool AnimatedModel::loadScene(const aiScene *scene)
 
 void AnimatedModel::draw(const Graphics &graphics, double timeElapsed)
 {
+/*
+    if(animationRange)
+    {std::cout << "Capping range!" << std::endl;
+        if(timeElapsed < animationRange->first)
+            timeElapsed = animationRange->first;
+        else if(timeElapsed > animationRange->second)
+            timeElapsed = fmod(timeElapsed, animationRange->second);
+    }
+*/
+
 
     for(unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
@@ -158,87 +192,116 @@ static glm::mat4x4 toMatrix(const aiMatrix4x4 &matrix)
     return result;
 }
 
-static glm::vec3 interpolatePosition(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime)
+static glm::vec3 interpolatePosition(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime, double minimumTime, double maximumTime)
 {
-    currentTime = fmod(currentTime, animation->mDuration);
 
-    unsigned int currentFrame = 0;
+    unsigned int minimumFrame = 0;
 
-    while(currentTime > channel->mPositionKeys[currentFrame + 1].mTime)
+    while(minimumFrame < channel->mNumPositionKeys - 1 && minimumTime > channel->mPositionKeys[minimumFrame + 1].mTime)
+    {
+        minimumFrame++;
+    }
+
+    currentTime = minimumTime + fmod(currentTime, maximumTime - minimumTime);
+
+    unsigned int maximumFrame = minimumFrame;
+
+    while(maximumFrame < channel->mNumPositionKeys - 1 && maximumTime > channel->mPositionKeys[maximumFrame + 1].mTime)
+    {
+        maximumFrame++;
+    }
+
+    currentTime = minimumTime + fmod(currentTime, maximumTime - minimumTime);
+
+    unsigned int currentFrame = minimumFrame;
+
+    while(currentFrame < channel->mNumPositionKeys - 1 && currentTime > channel->mPositionKeys[currentFrame + 1].mTime)
     {
         currentFrame++;
     }
 
-    const unsigned int nextFrame = (currentFrame + 1) % channel->mNumPositionKeys;
+    const unsigned int nextFrame = currentFrame == maximumFrame ? minimumFrame : currentFrame + 1;
 
     const aiVectorKey &currentKey = channel->mPositionKeys[currentFrame];
     const aiVectorKey &nextKey = channel->mPositionKeys[nextFrame];
 
     double timeDifference = nextKey.mTime - currentKey.mTime;
-
     if(timeDifference < 0)
-    {
-        timeDifference += animation->mDuration;
-    }
+        timeDifference += maximumTime - minimumTime;
 
-    const double interpolationFactor = (currentTime - currentKey.mTime) / timeDifference;
+    const double interpolationFactor = timeDifference ? (currentTime - currentKey.mTime) / timeDifference : 0.0f;
 
     return toVec3(currentKey.mValue) + toVec3(nextKey.mValue - currentKey.mValue) * (float)interpolationFactor;
 }
 
-static glm::mat4x4 interpolateRotation(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime)
+static glm::mat4x4 interpolateRotation(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime, double minimumTime, double maximumTime)
 {
-    currentTime = fmod(currentTime, animation->mDuration);
+    unsigned int minimumFrame = 0;
 
-    unsigned int currentFrame = 0;
-
-    while(currentFrame < channel->mNumRotationKeys - 1)
+    while(minimumFrame < channel->mNumRotationKeys - 1 && minimumTime > channel->mRotationKeys[minimumFrame + 1].mTime)
     {
-        if(currentTime < channel->mRotationKeys[currentFrame + 1].mTime)
-        {
-            break;
-        }
+        minimumFrame++;
+    }
+
+    currentTime = minimumTime + fmod(currentTime, maximumTime - minimumTime);
+
+    unsigned int maximumFrame = minimumFrame;
+
+    while(maximumFrame < channel->mNumRotationKeys - 1 && maximumTime > channel->mRotationKeys[maximumFrame + 1].mTime)
+    {
+        maximumFrame++;
+    }
+
+    currentTime = minimumTime + fmod(currentTime, maximumTime - minimumTime);
+
+    unsigned int currentFrame = minimumFrame;
+
+    while(currentFrame < channel->mNumRotationKeys - 1 && currentTime > channel->mRotationKeys[currentFrame + 1].mTime)
+    {
         currentFrame++;
     }
 
-    unsigned int nextFrame = (currentFrame + 1) >= channel->mNumRotationKeys ? 0 : (currentFrame + 1);
+    const unsigned int nextFrame = currentFrame == maximumFrame ? minimumFrame : currentFrame + 1;
 
     const aiQuatKey &currentKey = channel->mRotationKeys[currentFrame];
     const aiQuatKey &nextKey = channel->mRotationKeys[nextFrame];
 
     double timeDifference = nextKey.mTime - currentKey.mTime;
-
     if(timeDifference < 0)
-    {
-        timeDifference += animation->mDuration;
-    }
+        timeDifference += maximumTime - minimumTime;
 
-    const double interpolationFactor = timeDifference != 0.0
-    ? (currentTime - currentKey.mTime) / timeDifference : 0.0;
+    const double interpolationFactor = timeDifference ? (currentTime - currentKey.mTime) / timeDifference : 0.0f;
+
+    const aiQuaternion &currentQuat = currentKey.mValue;
+    const aiQuaternion &nextQuat = nextKey.mValue;
 
     aiQuaternion result;
-    aiQuaternion::Interpolate(result, currentKey.mValue, nextKey.mValue, (float)interpolationFactor);
+    aiQuaternion::Interpolate(result, currentQuat, nextQuat, (float)interpolationFactor);
 
     return toMatrix(aiMatrix4x4(result.GetMatrix()));
 }
 
 
-static glm::vec3 interpolateScale(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime)
+static glm::vec3 interpolateScale(const aiAnimation *animation, const aiNodeAnim *channel, double currentTime, double minimumTime, double maximumTime)
 {
-    currentTime = fmod(currentTime, animation->mDuration);
 
-    unsigned int currentFrame = 0;
+    unsigned int minimumFrame = 0;
 
-    while(currentFrame < channel->mNumScalingKeys - 1)
+    while(minimumFrame < channel->mNumScalingKeys - 1 && minimumTime > channel->mScalingKeys[minimumFrame + 1].mTime)
     {
-        if(currentTime < channel->mScalingKeys[currentFrame + 1].mTime)
-        {
-            break;
-        }
+        minimumFrame++;
+    }
+
+    currentTime = minimumTime + fmod(currentTime, maximumTime - minimumTime);
+
+    unsigned int currentFrame = minimumFrame;
+
+    while(currentFrame < channel->mNumScalingKeys - 1 && currentTime > channel->mScalingKeys[currentFrame + 1].mTime)
+    {
         currentFrame++;
     }
 
-    unsigned int nextFrame = (currentFrame + 1) >= channel->mNumScalingKeys ? 0 : (currentFrame + 1);
+    const unsigned int nextFrame = channel->mScalingKeys[currentFrame + 1].mTime < maximumTime ? (currentFrame + 1) : minimumFrame;
 
     const aiVectorKey &currentKey = channel->mScalingKeys[currentFrame];
     const aiVectorKey &nextKey = channel->mScalingKeys[nextFrame];
@@ -250,8 +313,7 @@ static glm::vec3 interpolateScale(const aiAnimation *animation, const aiNodeAnim
         timeDifference += animation->mDuration;
     }
 
-    const double interpolationFactor = timeDifference != 0.0
-    ? (currentTime - currentKey.mTime) / timeDifference : 0.0;
+    const double interpolationFactor = timeDifference ? (currentTime - currentKey.mTime) / timeDifference : 0.0f;
 
     return toVec3(currentKey.mValue) + toVec3(nextKey.mValue - currentKey.mValue) * (float)interpolationFactor;
 }
@@ -270,11 +332,11 @@ glm::mat4x4 AnimatedModel::getNodeTransform(const aiNode *node, double timeElaps
 
     const aiNodeAnim *currentChannel = channelIterator->second;
 
-    const glm::mat4x4 channelRotation = interpolateRotation(scene->mAnimations[0], currentChannel, timeElapsed);
-    const glm::mat4x4 channelScale = glm::scale(glm::mat4x4(), interpolateScale(scene->mAnimations[0], currentChannel, timeElapsed));
-    const glm::mat4x4 channelPosition = glm::translate(glm::mat4x4(), interpolatePosition(scene->mAnimations[0], currentChannel, timeElapsed)/*toVec3(currentChannel->mPositionKeys[0].mValue)*/);
+    const glm::mat4x4 channelRotation = interpolateRotation(scene->mAnimations[0], currentChannel, timeElapsed, animationRange->first, animationRange->second);
+    const glm::mat4x4 channelScale = glm::scale(glm::mat4x4(), interpolateScale(scene->mAnimations[0], currentChannel, timeElapsed, animationRange->first, animationRange->second));
+    const glm::mat4x4 channelPosition = glm::translate(glm::mat4x4(), interpolatePosition(scene->mAnimations[0], currentChannel, timeElapsed, animationRange->first, animationRange->second)/*toVec3(currentChannel->mPositionKeys[0].mValue)*/);
 
-    const glm::mat4x4 channelTransform = channelRotation * channelScale * channelPosition;
+    const glm::mat4x4 channelTransform = channelPosition * channelRotation /* * channelScale*/;
 
     if(node->mParent)
     {
@@ -450,7 +512,6 @@ void AnimatedMesh::draw(const Graphics &graphics, double timeElapsed) const
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[INDEX_BUFFER]);
     glDrawElements(GL_TRIANGLES, numberOfIndices, GL_UNSIGNED_INT, (void*)0);
-
 }
 
 #undef POSITION_BUFFER

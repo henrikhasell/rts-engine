@@ -17,13 +17,12 @@ uniform mat4 boneMatrices[64];
 void main()
 {
 
-    vec4 boneWeights = in_BoneWeights;
-    boneWeights.w = 1.0 - dot(boneWeights.xyz, vec3(1.0, 1.0, 1.0));
+    //in_BoneWeights.w = 1.0 - dot(in_BoneWeights.xyz, vec3(1.0, 1.0, 1.0));
 
-    mat4 transformMatrix = boneWeights.x * boneMatrices[int(in_BoneIndices.x)];
-    transformMatrix += boneWeights.y * boneMatrices[int(in_BoneIndices.y)];
-    transformMatrix += boneWeights.z * boneMatrices[int(in_BoneIndices.z)];
-    transformMatrix += boneWeights.w * boneMatrices[int(in_BoneIndices.w)];
+    mat4 transformMatrix = in_BoneWeights.x * boneMatrices[int(in_BoneIndices.x)];
+    transformMatrix += in_BoneWeights.y * boneMatrices[int(in_BoneIndices.y)];
+    transformMatrix += in_BoneWeights.z * boneMatrices[int(in_BoneIndices.z)];
+    transformMatrix += in_BoneWeights.w * boneMatrices[int(in_BoneIndices.w)];
 
     vec4 modified_Position = transformMatrix * in_Position;
     vec4 modified_Normal = transformMatrix * vec4(in_Normal, 0.0);
