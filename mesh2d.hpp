@@ -15,7 +15,7 @@ namespace GL
 class Mesh2D
 {
 public:
-    static Mesh2D createRectangle(float width, float height);
+    static void createRectangle(Mesh2D &mesh, float w, float h);
     Mesh2D();
     ~Mesh2D();
     void setVertices(const std::vector<glm::vec2> &vertexArray);

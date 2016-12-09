@@ -105,8 +105,12 @@ int main (void)
                                 animatedModel.addAnimationRange("death2", 174, 182);
                                 animatedModel.addAnimationRange("kick", 73, 83);
 
-
                                 animatedModel.setAnimationRange("idle3");
+
+                                std::vector<Engine::GL::Texture> buttonApperance;
+                                Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button_small.png");
+
+
 
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;

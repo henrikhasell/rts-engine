@@ -2,6 +2,18 @@
 #include <iostream>
 #include <SDL2/SDL_image.h>
 
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+#   define R_MASK 0xFF000000
+#   define G_MASK 0x00FF0000
+#   define B_MASK 0x0000FF00
+#   define A_MASK 0x000000FF
+#else
+#   define R_MASK 0x000000FF
+#   define G_MASK 0x0000FF00
+#   define B_MASK 0x00FF0000
+#   define A_MASK 0xFF000000
+#endif // SDL_BYTEORDER
+
 using namespace Engine;
 using namespace GL;
 
@@ -15,18 +27,87 @@ Texture::~Texture()
     glDeleteTextures(1, &texture);
 }
 
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-#   define R_MASK 0xFF000000
-#   define G_MASK 0x00FF0000
-#   define B_MASK 0x0000FF00
-#   define A_MASK 0x000000FF
-#else
-#   define R_MASK 0x000000FF
-#   define G_MASK 0x0000FF00
-#   define B_MASK 0x00FF0000
-#   define A_MASK 0xFF000000
-#endif // SDL_BYTEORDER
+static inline Uint8 *getPixel(SDL_Surface *surface, int x, int y)
+{
+    return (Uint8*)surface->pixels + (surface->pitch * y) + (x * surface->format->BytesPerPixel);
+}
 
+void Texture::loadSpriteSheet(std::vector<Texture> &apperance, const char path[])
+{
+    SDL_Surface *spriteSheet = IMG_Load(path);
+
+    if(spriteSheet)
+    {
+        SDL_Surface *optimised = SDL_CreateRGBSurface(0, spriteSheet->w, spriteSheet->h, 32, R_MASK, G_MASK, B_MASK, A_MASK);
+
+        if(optimised)
+        {
+            SDL_BlitSurface(spriteSheet, NULL, optimised, NULL);
+
+            int start_x;
+            int start_y;
+            int curr_w = 0;
+            int curr_h = 1;
+
+            for(int y = 0; y < optimised->h; y++)
+            {
+                for(int x = 0; x < optimised->w; x++)
+                {
+                    Uint8 *pixel = getPixel(optimised, x, y);
+
+                    if(!curr_w)
+                    {
+                        start_x = x;
+                        start_y = y;
+                    }
+
+                    if(*(Uint32*)pixel == 0xff0000ff)
+                    {
+                        for(int i = 0; i < curr_w; i++)
+                        {
+                                Uint8 *pixel = getPixel(optimised, start_x + i, start_y);
+                                *(Uint32*)pixel = 0xff0000ff;
+                        }
+
+                        for(int j = 0; j < curr_h; j++)
+                        {
+                            for(int i = 0; i < curr_w; i++)
+                            {
+                                Uint8 *pixel = getPixel(optimised, i, curr_h);
+
+                                if(*(Uint32*)pixel == 0xff0000ff)
+                                {
+                                    break;
+                                }
+                                else if(i == curr_w - 1)
+                                {
+                                    curr_h++;
+                                }
+
+                                *(Uint32*)pixel = 0xff0000ff;
+                            }
+                        }
+
+                        if(curr_w)
+                        {
+                            std::cout << "Found shape at " << start_x << ", " << start_y << " of size " << curr_w << ", " << curr_h << std::endl;
+                            curr_w = 0;
+                            curr_h = 1;
+                        }
+                    }
+                    else
+                    {
+                        curr_w++;
+                    }
+                }
+            }
+
+            SDL_FreeSurface(optimised);
+        }
+
+        SDL_FreeSurface(spriteSheet);
+    }
+}
 bool Texture::load(const char path[])
 {
     bool result = false;

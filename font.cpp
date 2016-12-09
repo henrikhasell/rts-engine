@@ -37,19 +37,8 @@ bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[]) con
         float w = surface->w;
         float h = surface->h;
 
-        std::vector<glm::vec2> vertexArray {
-            {w, 0.0f}, {w, h}, {0.0f, 0.0f}, {0.0f, h}
-        };
-        std::vector<glm::vec2> uvArray {
-            {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 1.0f}
-        };
-        std::vector<GLuint> indexArray {
-            1, 0, 2, 1, 2, 3
-        };
+        Mesh2D::createRectangle(mesh, w, h);
 
-        mesh.setVertices(vertexArray);
-        mesh.setTextureCoordinates(uvArray);
-        mesh.setIndices(indexArray);
         texture.load(surface);
 
         SDL_FreeSurface(surface);

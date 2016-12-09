@@ -10,9 +10,21 @@
 using namespace Engine;
 using namespace GL;
 
-Mesh2D Mesh2D::createRectangle(float width, float height)
+void Mesh2D::createRectangle(Mesh2D &mesh, float w, float h)
 {
+    std::vector<glm::vec2> vertexArray {
+        {w, 0.0f}, {w, h}, {0.0f, 0.0f}, {0.0f, h}
+    };
+    std::vector<glm::vec2> uvArray {
+        {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 1.0f}
+    };
+    std::vector<GLuint> indexArray {
+        1, 0, 2, 1, 2, 3
+    };
 
+    mesh.setVertices(vertexArray);
+    mesh.setTextureCoordinates(uvArray);
+    mesh.setIndices(indexArray);
 }
 
 Mesh2D::Mesh2D() : numberOfIndices(0)
