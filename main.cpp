@@ -91,7 +91,7 @@ int main (void)
 
                                 Engine::GL::AnimatedModel animatedModel;
                                 animatedModel.loadFile("models/ninja/ninja.b3d");
-                                animatedModel.setTexture(0,"models/ninja/nskinbl.jpg");
+                                animatedModel.setTexture(0,"models/ninja/nskingr.jpg");
                                 animatedModel.addAnimationRange("walk", 1, 14);
                                 animatedModel.addAnimationRange("stealth walk", 15, 30);
                                 animatedModel.addAnimationRange("jump", 94, 102);
@@ -105,7 +105,7 @@ int main (void)
                                 animatedModel.addAnimationRange("death2", 174, 182);
                                 animatedModel.addAnimationRange("kick", 73, 83);
 
-                                animatedModel.setAnimationRange("idle3");
+                                animatedModel.setAnimationRange("walk");
 
                                 std::vector<Engine::GL::Texture> buttonApperance;
                                 Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button_small.png");

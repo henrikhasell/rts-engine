@@ -73,7 +73,7 @@ void Texture::loadSpriteSheet(std::vector<Texture> &apperance, const char path[]
                         {
                             for(int i = 0; i < curr_w; i++)
                             {
-                                Uint8 *pixel = getPixel(optimised, i, curr_h);
+                                Uint8 *pixel = getPixel(optimised, start_x + i, start_y + curr_h);
 
                                 if(*(Uint32*)pixel == 0xff0000ff)
                                 {
@@ -120,8 +120,6 @@ bool Texture::load(const char path[])
     }
 
     SDL_FreeSurface(surface);
-
-    std::cout << "Loading " << path << ": " << result << std::endl;
 
     return result;
 }
