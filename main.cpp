@@ -21,6 +21,7 @@
 #include "scene.hpp"
 #include "font.hpp"
 #include "textfield.hpp"
+#include "button.hpp"
 
 #define PROJECT_NAME "Shitty game engine."
 #define SCREEN_WIDTH 1280
@@ -107,9 +108,9 @@ int main (void)
 
                                 animatedModel.setAnimationRange("walk");
 
-                                std::vector<Engine::GL::Texture> buttonApperance;
+                                std::vector<Engine::GL::Texture> buttonApperance(3 * 3);
                                 Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button_small.png");
-
+                                Engine::GL::Button testButton(buttonApperance, 100, 100, 0, 0);
 
 
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
@@ -190,8 +191,9 @@ int main (void)
 
 
                                     graphics.begin2D();
-                                        textField.draw(graphics);
-                                        console.draw(graphics);
+                                        //textField.draw(graphics);
+                                        //console.draw(graphics);
+                                        testButton.draw(graphics);
                                     graphics.end2D();
 
                                     SDL_GL_SwapWindow(window);

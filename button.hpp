@@ -11,10 +11,11 @@ namespace GL
 class Button
 {
 public:
-    Button(std::vector<Button> &apperance, float w, float h, float x, float y);
+    Button(std::vector<Texture> &apperance, float w, float h, float x, float y);
     ~Button();
+    void draw(const Graphics &graphics) const;
 private:
-    std::vector<Button> &apperance;
+    std::vector<Texture> &apperance;
     std::vector<Mesh2D> mesh;
 }; // Button
 }; // GUI

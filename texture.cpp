@@ -20,11 +20,31 @@ using namespace GL;
 Texture::Texture()
 {
     glGenTextures(1, &texture);
+
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    const GLubyte pixels[] = {
+        0xff, 0xff, 0xff, 0xff,   0xff, 0xff, 0xff, 0xff,
+        0xff, 0xff, 0xff, 0xff,   0xff, 0xff, 0xff, 0xff
+    };
+
+    glTexImage2D(GL_TEXTURE_2D, 0, 4,
+        2,
+        2, 0,
+        GL_RGBA, GL_UNSIGNED_BYTE,
+        pixels
+    );
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    std::cout << "Constructing textrue " << this << std::endl;
 }
 
 Texture::~Texture()
 {
     glDeleteTextures(1, &texture);
+    std::cout << "Deconstructing textrue " << this << std::endl;
 }
 
 static inline Uint8 *getPixel(SDL_Surface *surface, int x, int y)
@@ -32,7 +52,7 @@ static inline Uint8 *getPixel(SDL_Surface *surface, int x, int y)
     return (Uint8*)surface->pixels + (surface->pitch * y) + (x * surface->format->BytesPerPixel);
 }
 
-void Texture::loadSpriteSheet(std::vector<Texture> &apperance, const char path[])
+void Texture::loadSpriteSheet(std::vector<Texture> &container, const char path[])
 {
     SDL_Surface *spriteSheet = IMG_Load(path);
 
@@ -47,6 +67,8 @@ void Texture::loadSpriteSheet(std::vector<Texture> &apperance, const char path[]
             SDL_Rect area;
             area.w = 0;
             area.h = 1;
+
+            size_t numberOfShapes = 0;
 
             for(int y = 0; y < optimised->h; y++)
             {
@@ -95,7 +117,24 @@ void Texture::loadSpriteSheet(std::vector<Texture> &apperance, const char path[]
                             area.w << ", " <<
                             area.h << std::endl;
 
-                            SDL_Surface *cropped;//TODO: Crop this.
+                            SDL_Surface *cropped = SDL_CreateRGBSurface(0, area.w, area.h, 32, R_MASK, G_MASK, B_MASK, A_MASK);
+
+                            if(cropped)
+                            {
+                                SDL_BlitSurface(optimised, &area, cropped, NULL);
+
+                                if(container[numberOfShapes++].load(cropped) == true)
+                                {
+                                    std::cout << "Loaded sprite into texture." << std::endl;
+                                }
+                                else
+                                {
+                                    std::cout << "Failed to load image." << std::endl;
+                                }
+
+                                SDL_FreeSurface(cropped);
+                            }
+
 
                             area.w = 0;
                             area.h = 1;
@@ -132,6 +171,8 @@ bool Texture::load(const char path[])
 
 bool Texture::load(SDL_Surface *surface)
 {
+    glBindTexture(GL_TEXTURE_2D, texture);
+
     SDL_Surface *optimised = SDL_CreateRGBSurface(0, surface->w, surface->h, 32, R_MASK, G_MASK, B_MASK, A_MASK);
 
     if(optimised)
