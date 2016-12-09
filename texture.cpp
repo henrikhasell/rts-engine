@@ -44,10 +44,9 @@ void Texture::loadSpriteSheet(std::vector<Texture> &apperance, const char path[]
         {
             SDL_BlitSurface(spriteSheet, NULL, optimised, NULL);
 
-            int start_x;
-            int start_y;
-            int curr_w = 0;
-            int curr_h = 1;
+            SDL_Rect area;
+            area.w = 0;
+            area.h = 1;
 
             for(int y = 0; y < optimised->h; y++)
             {
@@ -55,49 +54,56 @@ void Texture::loadSpriteSheet(std::vector<Texture> &apperance, const char path[]
                 {
                     Uint8 *pixel = getPixel(optimised, x, y);
 
-                    if(!curr_w)
+                    if(!area.w)
                     {
-                        start_x = x;
-                        start_y = y;
+                        area.x = x;
+                        area.y = y;
                     }
 
                     if(*(Uint32*)pixel == 0xff0000ff)
                     {
-                        for(int i = 0; i < curr_w; i++)
+                        for(int i = 0; i < area.w; i++)
                         {
-                                Uint8 *pixel = getPixel(optimised, start_x + i, start_y);
+                                Uint8 *pixel = getPixel(optimised, area.x + i, area.y);
                                 *(Uint32*)pixel = 0xff0000ff;
                         }
 
-                        for(int j = 0; j < curr_h; j++)
+                        for(int j = 0; j < area.h; j++)
                         {
-                            for(int i = 0; i < curr_w; i++)
+                            for(int i = 0; i < area.w; i++)
                             {
-                                Uint8 *pixel = getPixel(optimised, start_x + i, start_y + curr_h);
+                                Uint8 *pixel = getPixel(optimised, area.x + i, area.y + area.h);
 
                                 if(*(Uint32*)pixel == 0xff0000ff)
                                 {
                                     break;
                                 }
-                                else if(i == curr_w - 1)
+                                else if(i == area.w - 1)
                                 {
-                                    curr_h++;
+                                    area.h++;
                                 }
 
                                 *(Uint32*)pixel = 0xff0000ff;
                             }
                         }
 
-                        if(curr_w)
+                        if(area.w)
                         {
-                            std::cout << "Found shape at " << start_x << ", " << start_y << " of size " << curr_w << ", " << curr_h << std::endl;
-                            curr_w = 0;
-                            curr_h = 1;
+                            std::cout << "Found shape at " <<
+                            area.x << ", " <<
+                            area.y << " of size " <<
+                            area.w << ", " <<
+                            area.h << std::endl;
+
+                            SDL_Surface *cropped;//TODO: Crop this.
+
+                            area.w = 0;
+                            area.h = 1;
                         }
                     }
                     else
                     {
-                        curr_w++;
+                        area.w++;
                     }
                 }
             }
