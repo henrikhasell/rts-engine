@@ -37,7 +37,7 @@ bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[]) con
         float w = surface->w;
         float h = surface->h;
 
-        Mesh2D::createRectangle(mesh, w, h);
+        Mesh2D::createRectangle(mesh, 0.0f, 0.0f, w, h);
 
         texture.load(surface);
 

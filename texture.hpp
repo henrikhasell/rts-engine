@@ -18,8 +18,12 @@ class Texture
         bool load(const char path[]);
         bool load(SDL_Surface *surface);
         void bind() const;
+        int getW();
+        int getH();
     private:
         GLuint texture;
+        int w;
+        int h;
 }; // Texture
 }; // GL
 }; // Engine

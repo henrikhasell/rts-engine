@@ -10,10 +10,10 @@
 using namespace Engine;
 using namespace GL;
 
-void Mesh2D::createRectangle(Mesh2D &mesh, float w, float h)
+void Mesh2D::createRectangle(Mesh2D &mesh, float x, float y, float w, float h)
 {
     std::vector<glm::vec2> vertexArray {
-        {w, 0.0f}, {w, h}, {0.0f, 0.0f}, {0.0f, h}
+        {x + w, y}, {x + w, y + h}, {x, y}, {x, y + h}
     };
     std::vector<glm::vec2> uvArray {
         {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}, {0.0f, 1.0f}

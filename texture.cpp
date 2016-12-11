@@ -17,15 +17,15 @@
 using namespace Engine;
 using namespace GL;
 
-Texture::Texture()
+Texture::Texture() : w(0), h(0)
 {
     glGenTextures(1, &texture);
-
+/*
     glBindTexture(GL_TEXTURE_2D, texture);
 
     const GLubyte pixels[] = {
-        0xff, 0xff, 0xff, 0xff,   0xff, 0xff, 0xff, 0xff,
-        0xff, 0xff, 0xff, 0xff,   0xff, 0xff, 0xff, 0xff
+        0xff, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0xff, 0xff
     };
 
     glTexImage2D(GL_TEXTURE_2D, 0, 4,
@@ -37,14 +37,12 @@ Texture::Texture()
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    std::cout << "Constructing textrue " << this << std::endl;
+*/
 }
 
 Texture::~Texture()
 {
     glDeleteTextures(1, &texture);
-    std::cout << "Deconstructing textrue " << this << std::endl;
 }
 
 static inline Uint8 *getPixel(SDL_Surface *surface, int x, int y)
@@ -70,11 +68,19 @@ void Texture::loadSpriteSheet(std::vector<Texture> &container, const char path[]
 
             size_t numberOfShapes = 0;
 
+            bool *visited = new bool[optimised->w * optimised->h];
+
+            for(int i = 0; i < optimised->w * optimised->h; i++)
+            {
+                visited[i] = false;
+            }
+
             for(int y = 0; y < optimised->h; y++)
             {
                 for(int x = 0; x < optimised->w; x++)
                 {
                     Uint8 *pixel = getPixel(optimised, x, y);
+                    bool &visited_index = visited[x + y * optimised->w];
 
                     if(!area.w)
                     {
@@ -82,12 +88,11 @@ void Texture::loadSpriteSheet(std::vector<Texture> &container, const char path[]
                         area.y = y;
                     }
 
-                    if(*(Uint32*)pixel == 0xff0000ff)
+                    if(*(Uint32*)pixel == 0xff0000ff || visited_index)
                     {
-                        for(int i = 0; i < area.w; i++)
+                        for(int i = 1/* Change to 1? */; i < area.w; i++)
                         {
-                                Uint8 *pixel = getPixel(optimised, area.x + i, area.y);
-                                *(Uint32*)pixel = 0xff0000ff;
+                                visited_index = true;
                         }
 
                         for(int j = 0; j < area.h; j++)
@@ -95,8 +100,9 @@ void Texture::loadSpriteSheet(std::vector<Texture> &container, const char path[]
                             for(int i = 0; i < area.w; i++)
                             {
                                 Uint8 *pixel = getPixel(optimised, area.x + i, area.y + area.h);
+                                bool &visited_index = visited[area.x + i + (area.y + area.h) * optimised->w];
 
-                                if(*(Uint32*)pixel == 0xff0000ff)
+                                if(*(Uint32*)pixel == 0xff0000ff || visited_index)
                                 {
                                     break;
                                 }
@@ -105,7 +111,7 @@ void Texture::loadSpriteSheet(std::vector<Texture> &container, const char path[]
                                     area.h++;
                                 }
 
-                                *(Uint32*)pixel = 0xff0000ff;
+                                visited_index = true;
                             }
                         }
 
@@ -123,14 +129,7 @@ void Texture::loadSpriteSheet(std::vector<Texture> &container, const char path[]
                             {
                                 SDL_BlitSurface(optimised, &area, cropped, NULL);
 
-                                if(container[numberOfShapes++].load(cropped) == true)
-                                {
-                                    std::cout << "Loaded sprite into texture." << std::endl;
-                                }
-                                else
-                                {
-                                    std::cout << "Failed to load image." << std::endl;
-                                }
+                                container[numberOfShapes++].load(cropped);
 
                                 SDL_FreeSurface(cropped);
                             }
@@ -147,7 +146,11 @@ void Texture::loadSpriteSheet(std::vector<Texture> &container, const char path[]
                 }
             }
 
+            delete[] visited;
+
             SDL_FreeSurface(optimised);
+
+            std::cout << "Number of shapes found: " << numberOfShapes << std::endl;
         }
 
         SDL_FreeSurface(spriteSheet);
@@ -171,8 +174,6 @@ bool Texture::load(const char path[])
 
 bool Texture::load(SDL_Surface *surface)
 {
-    glBindTexture(GL_TEXTURE_2D, texture);
-
     SDL_Surface *optimised = SDL_CreateRGBSurface(0, surface->w, surface->h, 32, R_MASK, G_MASK, B_MASK, A_MASK);
 
     if(optimised)
@@ -180,21 +181,7 @@ bool Texture::load(SDL_Surface *surface)
         SDL_BlitSurface(surface, NULL, optimised, NULL);
 
         glBindTexture(GL_TEXTURE_2D, texture);
-/*
-        GLubyte pixels[] = {
-            0xff, 0xff, 0xff, 0xff,   0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff,   0xff, 0xff, 0xff, 0xff
-        };
-        glTexImage2D(GL_TEXTURE_2D, 0, 4,
-            2,
-            2, 0,
-            GL_RGBA, GL_UNSIGNED_BYTE,
-            pixels
-        );
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-*/
         glTexImage2D(GL_TEXTURE_2D, 0, 4,
             optimised->w,
             optimised->h, 0,
@@ -202,8 +189,11 @@ bool Texture::load(SDL_Surface *surface)
             optimised->pixels
         );
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        w = optimised->w;
+        h = optimised->h;
 
         SDL_FreeSurface(optimised);
     }
@@ -219,4 +209,14 @@ bool Texture::load(SDL_Surface *surface)
 void Texture::bind() const
 {
     glBindTexture(GL_TEXTURE_2D, texture);
+}
+
+int Texture::getW()
+{
+    return w;
+}
+
+int Texture::getH()
+{
+    return h;
 }

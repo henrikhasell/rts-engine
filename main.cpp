@@ -108,9 +108,12 @@ int main (void)
 
                                 animatedModel.setAnimationRange("walk");
 
-                                std::vector<Engine::GL::Texture> buttonApperance(3 * 3);
-                                Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button_small.png");
-                                Engine::GL::Button testButton(buttonApperance, 100, 100, 0, 0);
+                                std::vector<Engine::GL::Texture> buttonApperance(3 * 3 * 4);
+                                Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button.png");
+                                Engine::GL::Button testButton(buttonApperance, 20, 20, 200, 30);
+                                Engine::GL::Button testButton2(buttonApperance, 20, 55, 200, 30);
+                                Engine::GL::Button testButton3(buttonApperance, 20, 90, 200, 30);
+                                Engine::GL::Button testButton4(buttonApperance, 20, 125, 200, 30);
 
 
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
@@ -191,9 +194,12 @@ int main (void)
 
 
                                     graphics.begin2D();
-                                        //textField.draw(graphics);
-                                        //console.draw(graphics);
                                         testButton.draw(graphics);
+                                        testButton2.draw(graphics);
+                                        testButton3.draw(graphics);
+                                        testButton4.draw(graphics);
+                                        textField.draw(graphics);
+                                        console.draw(graphics);
                                     graphics.end2D();
 
                                     SDL_GL_SwapWindow(window);
