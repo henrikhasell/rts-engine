@@ -163,9 +163,14 @@ int main (void)
 
                                                 }
                                             }
-                                            else if(event.type == SDL_TEXTINPUT)
+                                            else if(event.type == SDL_MOUSEMOTION)
                                             {
-                                                console.appendInput(font, event.text.text);
+                                                std::cout << "Mouse motion event: " << event.motion.state << ", " << event.motion.x << ", " << event.motion.y << std::endl;
+                                            }
+                                            else if(event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
+                                            {
+                                                std::cout << "Mouse button  event: " << (event.button.state == SDL_PRESSED) << " " <<
+                                                (int)event.button.button << ", " << event.button.x << ", " << event.button.y << std::endl;
                                             }
                                         }
                                     }

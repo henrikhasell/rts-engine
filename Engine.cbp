@@ -70,6 +70,8 @@
 		<Unit filename="mesh3d.cpp" />
 		<Unit filename="mesh3d.hpp" />
 		<Unit filename="models/cube.obj" />
+		<Unit filename="mouse.cpp" />
+		<Unit filename="mouse.hpp" />
 		<Unit filename="program.cpp" />
 		<Unit filename="program.hpp" />
 		<Unit filename="scene.cpp" />
