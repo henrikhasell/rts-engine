@@ -22,6 +22,7 @@
 #include "font.hpp"
 #include "textfield.hpp"
 #include "button.hpp"
+#include "mouse.hpp"
 
 #define PROJECT_NAME "Shitty game engine."
 #define SCREEN_WIDTH 1280
@@ -108,14 +109,6 @@ int main (void)
 
                                 animatedModel.setAnimationRange("walk");
 
-                                std::vector<Engine::GL::Texture> buttonApperance(3 * 3 * 4);
-                                Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button.png");
-                                Engine::GL::Button testButton(buttonApperance, 20, 20, 200, 30);
-                                Engine::GL::Button testButton2(buttonApperance, 20, 55, 200, 30);
-                                Engine::GL::Button testButton3(buttonApperance, 20, 90, 200, 30);
-                                Engine::GL::Button testButton4(buttonApperance, 20, 125, 200, 30);
-
-
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;
                                 }
@@ -129,6 +122,25 @@ int main (void)
                                 if(teapotModel.loadFile("models/teapot.obj") == true) {
                                     std::cout << "Successfully loaded teapot!" << std::endl;
                                 }
+
+                                std::vector<Engine::GL::Texture> buttonApperance(3 * 3 * 4);
+                                Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button.png");
+
+                                Engine::GL::Button testButton(buttonApperance, 20, 100 + 35 * 1, 200, 30);
+                                Engine::GL::Button testButton2(buttonApperance, 20, 100 + 35 * 2, 200, 30);
+                                Engine::GL::Button testButton3(buttonApperance, 20, 100 + 35 * 3, 200, 30);
+                                Engine::GL::Button testButton4(buttonApperance, 20, 100 + 35 * 4, 200, 30);
+
+                                testButton.setText(font, "1");
+                                testButton2.setText(font, "2");
+                                testButton3.setText(font, "3");
+                                testButton4.setText(font, "4");
+
+                                Engine::MouseHandler mouseHandler;
+                                mouseHandler.addButton(testButton);
+                                mouseHandler.addButton(testButton2);
+                                mouseHandler.addButton(testButton3);
+                                mouseHandler.addButton(testButton4);
 
                                 Uint32 timeStep = 0;
 
@@ -165,12 +177,11 @@ int main (void)
                                             }
                                             else if(event.type == SDL_MOUSEMOTION)
                                             {
-                                                std::cout << "Mouse motion event: " << event.motion.state << ", " << event.motion.x << ", " << event.motion.y << std::endl;
+                                                mouseHandler.handleMouseMotionEvent(&event.motion);
                                             }
                                             else if(event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP)
                                             {
-                                                std::cout << "Mouse button  event: " << (event.button.state == SDL_PRESSED) << " " <<
-                                                (int)event.button.button << ", " << event.button.x << ", " << event.button.y << std::endl;
+                                                mouseHandler.handleMouseButtonEvent(&event.button);
                                             }
                                         }
                                     }

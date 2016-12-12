@@ -2,14 +2,19 @@
 #define BUTTON_HPP
 
 #include "texture.hpp"
+#include "textfield.hpp"
 #include "mesh2d.hpp"
 
 namespace Engine
 {
+class MouseHandler;
+
 namespace GL
 {
 class Button
 {
+friend MouseHandler;
+
 public:
     enum State
     {
@@ -18,12 +23,17 @@ public:
     Button(std::vector<Texture> &apperance, float x, float y, float w, float h);
     ~Button();
     void draw(const Graphics &graphics) const;
+    void setText(const GL::Font &font, const char text[]);
 private:
     void buildMesh(const std::vector<Texture> &apperance);
-    glm::vec2 position;
+    GL::TextField textField;
     std::vector<Texture> &apperance;
     std::vector<Mesh2D> mesh;
+    glm::vec2 position;
+    glm::vec2 textPosition;
     State state;
+    float w;
+    float h;
 }; // Button
 }; // GUI
 }; // Engine

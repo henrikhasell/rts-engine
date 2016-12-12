@@ -26,7 +26,7 @@ bool Font::load(const char path[])
     return font != nullptr;
 }
 
-bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[]) const
+bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[], float &w, float &h) const
 {
     SDL_Color white = {255, 255, 255};
 
@@ -34,8 +34,8 @@ bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[]) con
 
     if(surface)
     {
-        float w = surface->w;
-        float h = surface->h;
+        w = (float)surface->w;
+        h = (float)surface->h;
 
         Mesh2D::createRectangle(mesh, 0.0f, 0.0f, w, h);
 

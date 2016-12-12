@@ -3,7 +3,7 @@
 using namespace Engine;
 using namespace GL;
 
-TextField::TextField()
+TextField::TextField() : w(0.0f), h(0.0f)
 {
     //ctor
 }
@@ -15,7 +15,7 @@ TextField::~TextField()
 
 bool TextField::setText(const Font &font, const char text[])
 {
-    return font.renderString(mesh, texture, text);
+    return font.renderString(mesh, texture, text, w, h);
 }
 
 void TextField::draw(const Graphics &graphics) const
@@ -27,4 +27,14 @@ void TextField::draw(const Graphics &graphics, const glm::vec2 &position) const
 {
     texture.bind();
     mesh.draw(graphics, position);
+}
+
+float TextField::getW()
+{
+    return w;
+}
+
+float TextField::getH()
+{
+    return h;
 }

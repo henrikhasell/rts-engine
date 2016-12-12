@@ -17,9 +17,13 @@ public:
     bool setText(const Font &font, const char text[]);
     void draw(const Graphics &graphics) const;
     void draw(const Graphics &graphics, const glm::vec2 &position) const;
+    float getW();
+    float getH();
 private:
     Texture texture;
     Mesh2D mesh;
+    float w;
+    float h;
 };
 };
 };
