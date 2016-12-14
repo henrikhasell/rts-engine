@@ -5,32 +5,45 @@
 using namespace Engine;
 using namespace GL;
 
-Font::Font() : font(nullptr)
+Font::Font() : file(nullptr)
 {
+
 }
 
 Font::~Font()
 {
-    if(font) TTF_CloseFont(font);
+    if(file) SDL_RWclose(file);
 }
 
 bool Font::load(const char path[])
 {
-    SDL_RWops * file = SDL_RWFromFile(path, "r");
+    file = SDL_RWFromFile(path, "r");
 
-    if(file)
-    {
-        font = TTF_OpenFontIndexRW(file, 1, FONT_SIZE, 0);
-    }
-
-    return font != nullptr;
+    return file != nullptr;
 }
 
-bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[], float &w, float &h) const
+bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[], int size, float &w, float &h)
 {
+    std::map<int,TTF_Font*>::const_iterator i = fontMap.find(size);
+
+    TTF_Font *selected;
+
+    if(i == fontMap.end())
+    {
+        std::cout << "Loading font of size " << size << std::endl;
+        SDL_RWseek(file, 0, RW_SEEK_SET);
+        selected = fontMap[size] = TTF_OpenFontRW(file, 0, size);
+
+    }
+    else
+    {
+        std::cout << "Fetching font of size " << size << std::endl;
+        selected = (*i).second;
+    }
+
     SDL_Color white = {255, 255, 255};
 
-    SDL_Surface *surface = TTF_RenderUTF8_Blended(font, string, white);
+    SDL_Surface *surface = TTF_RenderUTF8_Blended(selected, string, white);
 
     if(surface)
     {

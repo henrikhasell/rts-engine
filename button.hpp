@@ -23,7 +23,7 @@ public:
     Button(std::vector<Texture> &apperance, float x, float y, float w, float h);
     ~Button();
     void draw(const Graphics &graphics) const;
-    void setText(const GL::Font &font, const char text[]);
+    void setText(GL::Font &font, const char text[]);
 private:
     void buildMesh(const std::vector<Texture> &apperance);
     GL::TextField textField;

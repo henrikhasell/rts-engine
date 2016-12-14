@@ -13,7 +13,7 @@ Console::~Console()
     //dtor
 }
 
-void Console::appendOutput(const Font &font, const char output[])
+void Console::appendOutput(Font &font, const char output[])
 {
     // Add a new mesh to the output array:
     outputText.emplace_back();
@@ -27,7 +27,7 @@ void Console::appendOutput(const Font &font, const char output[])
     }
 }
 
-void Console::appendInput(const Font &font, const char input[])
+void Console::appendInput(Font &font, const char input[])
 {
     // Arbitrary limit on input length:
     if(inputString.length() + strlen(input) <= 100)
@@ -39,7 +39,7 @@ void Console::appendInput(const Font &font, const char input[])
     }
 }
 
-void Console::submitInput(const Font &font, lua_State *luaState)
+void Console::submitInput(Font &font, lua_State *luaState)
 {
     // Check that there is something to submit:
     if(inputString.length() > 0)
@@ -61,7 +61,7 @@ void Console::submitInput(const Font &font, lua_State *luaState)
     }
 }
 
-void Console::backspace(const Font &font)
+void Console::backspace(Font &font)
 {
     // Check that the string has data:
     if(inputString.length() > 0)

@@ -16,10 +16,10 @@ public:
     Console();
     ~Console();
 
-    void appendOutput(const Font &font, const char output[]);
-    void appendInput(const Font &font, const char input[]);
-    void submitInput(const Font &font, lua_State *luaState);
-    void backspace(const Font &font);
+    void appendOutput(Font &font, const char output[]);
+    void appendInput(Font &font, const char input[]);
+    void submitInput(Font &font, lua_State *luaState);
+    void backspace(Font &font);
     void draw(const Graphics &graphics);
 protected:
     std::list<TextField> outputText;

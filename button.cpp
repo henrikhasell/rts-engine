@@ -54,7 +54,7 @@ void Button::draw(const Graphics &graphics) const
     }
 }
 
-void Button::setText(const GL::Font &font, const char text[])
+void Button::setText(GL::Font &font, const char text[])
 {
     textField.setText(font, text);
     textPosition.x = position.x + (w / 2.0f) - (textField.getW() / 2.0f);

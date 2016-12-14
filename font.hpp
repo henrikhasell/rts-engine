@@ -3,6 +3,7 @@
 
 #include "mesh2d.hpp"
 #include <SDL2/SDL_ttf.h>
+#include <map>
 
 #define FONT_SIZE 32
 
@@ -16,9 +17,10 @@ class Font
         Font();
         ~Font();
         bool load(const char path[]);
-        bool renderString(Mesh2D &mesh, Texture &texture, const char string[], float &w, float &h) const;
+        bool renderString(Mesh2D &mesh, Texture &texture, const char string[], int size, float &w, float &h);
     private:
-        TTF_Font *font;
+        std::map<int, TTF_Font*> fontMap;
+        SDL_RWops * file;
 }; // Font
 }; // GL
 

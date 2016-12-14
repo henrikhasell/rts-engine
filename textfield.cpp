@@ -13,9 +13,9 @@ TextField::~TextField()
     //dtor
 }
 
-bool TextField::setText(const Font &font, const char text[])
+bool TextField::setText(Font &font, const char text[])
 {
-    return font.renderString(mesh, texture, text, w, h);
+    return font.renderString(mesh, texture, text, 100, w, h);
 }
 
 void TextField::draw(const Graphics &graphics) const
