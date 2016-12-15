@@ -113,7 +113,7 @@ int main (void)
                                     std::cout << "Successfully loaded font!" << std::endl;
                                 }
 
-                                textField.setText(font, "Hello, world!");
+                                textField.setText(font, FONT_SIZE, "Hello, world!");
 /*
                                 if(font.renderString(text, "Hello, world!") == true) {
                                     std::cout << "Successfully created text mesh!" << std::endl;
@@ -131,10 +131,10 @@ int main (void)
                                 Engine::GL::Button testButton3(buttonApperance, 20, 100 + 35 * 3, 200, 30);
                                 Engine::GL::Button testButton4(buttonApperance, 20, 100 + 35 * 4, 200, 30);
 
-                                testButton.setText(font, "1");
-                                testButton2.setText(font, "2");
-                                testButton3.setText(font, "3");
-                                testButton4.setText(font, "4");
+                                testButton.setText(font, 22, "Walk");
+                                testButton2.setText(font, 22, "Attack");
+                                testButton3.setText(font, 22, "Jump");
+                                testButton4.setText(font, 22, "Backflip");
 
                                 Engine::MouseHandler mouseHandler;
                                 mouseHandler.addButton(testButton);

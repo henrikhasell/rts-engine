@@ -35,7 +35,7 @@ void Console::appendInput(Font &font, const char input[])
         // Append the input to the string buffer:
         inputString += input;
         // Update the graphical mesh:
-        inputText.setText(font, inputString.data());
+        inputText.setText(font, FONT_SIZE, inputString.data());
     }
 }
 
@@ -80,7 +80,7 @@ void Console::backspace(Font &font)
         // Update the graphical mesh (if appropriate):
         if(inputString.length() > 0)
         {
-            inputText.setText(font, inputString.data());
+            inputText.setText(font, FONT_SIZE, inputString.data());
         }
     }
 }

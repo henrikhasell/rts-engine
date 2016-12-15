@@ -12,6 +12,10 @@ Font::Font() : file(nullptr)
 
 Font::~Font()
 {
+    for(std::pair<const int,TTF_Font*> &pair : fontMap)
+    {
+        TTF_CloseFont(pair.second);
+    }
     if(file) SDL_RWclose(file);
 }
 
@@ -24,24 +28,22 @@ bool Font::load(const char path[])
 
 bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[], int size, float &w, float &h)
 {
-    std::map<int,TTF_Font*>::const_iterator i = fontMap.find(size);
+    std::map<const int,TTF_Font*>::const_iterator i = fontMap.find(size);
 
     TTF_Font *selected;
 
     if(i == fontMap.end())
     {
-        std::cout << "Loading font of size " << size << std::endl;
         SDL_RWseek(file, 0, RW_SEEK_SET);
         selected = fontMap[size] = TTF_OpenFontRW(file, 0, size);
 
     }
     else
     {
-        std::cout << "Fetching font of size " << size << std::endl;
         selected = (*i).second;
     }
 
-    SDL_Color white = {255, 255, 255};
+    SDL_Color white = {0, 0, 0};
 
     SDL_Surface *surface = TTF_RenderUTF8_Blended(selected, string, white);
 

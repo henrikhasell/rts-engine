@@ -117,11 +117,11 @@ void Texture::loadSpriteSheet(std::vector<Texture> &container, const char path[]
 
                         if(area.w)
                         {
-                            std::cout << "Found shape at " <<
+                            /* std::cout << "Found shape at " <<
                             area.x << ", " <<
                             area.y << " of size " <<
                             area.w << ", " <<
-                            area.h << std::endl;
+                            area.h << std::endl; */
 
                             SDL_Surface *cropped = SDL_CreateRGBSurface(0, area.w, area.h, 32, R_MASK, G_MASK, B_MASK, A_MASK);
 
@@ -150,7 +150,7 @@ void Texture::loadSpriteSheet(std::vector<Texture> &container, const char path[]
 
             SDL_FreeSurface(optimised);
 
-            std::cout << "Number of shapes found: " << numberOfShapes << std::endl;
+            // std::cout << "Number of shapes found: " << numberOfShapes << std::endl;
         }
 
         SDL_FreeSurface(spriteSheet);

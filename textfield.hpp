@@ -14,7 +14,7 @@ class TextField
 public:
     TextField();
     ~TextField();
-    bool setText(Font &font, const char text[]);
+    bool setText(Font &font, int size, const char text[]);
     void draw(const Graphics &graphics) const;
     void draw(const Graphics &graphics, const glm::vec2 &position) const;
     float getW();

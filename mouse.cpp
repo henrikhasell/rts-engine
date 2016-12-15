@@ -56,7 +56,17 @@ bool MouseHandler::handleMouseButtonEvent(SDL_MouseButtonEvent *event)
     {
         if(selected)
         {
-            selected->state = GL::Button::State::NORMAL;
+            if(
+            event->x >= selected->position.x && event->x <= selected->position.x + selected->w &&
+            event->y >= selected->position.y && event->y <= selected->position.y + selected->h
+            )
+            {
+                selected->state = GL::Button::State::HOVER;
+            }
+            else
+            {
+                selected->state = GL::Button::State::NORMAL;
+            }
             selected = nullptr;
         }
     }
