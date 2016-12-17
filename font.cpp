@@ -43,7 +43,7 @@ bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[], int
         selected = (*i).second;
     }
 
-    SDL_Color white = {0, 0, 0};
+    SDL_Color white = {0, 0, 0, 255};
 
     SDL_Surface *surface = TTF_RenderUTF8_Blended(selected, string, white);
 

@@ -178,6 +178,10 @@ bool Texture::load(SDL_Surface *surface)
 
     if(optimised)
     {
+        SDL_FillRect(optimised, NULL, 0x000000ff);
+    SDL_SetSurfaceAlphaMod(surface, 0xFF);
+        SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_NONE);
+
         SDL_BlitSurface(surface, NULL, optimised, NULL);
 
         glBindTexture(GL_TEXTURE_2D, texture);

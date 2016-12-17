@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <list>
-#include <lua5.2/lua.hpp>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -9,7 +8,6 @@
 #include <GL/glew.h>
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
-#include <btBulletDynamicsCommon.h>
 
 #include "animation.hpp"
 #include "graphics.hpp"
@@ -109,7 +107,7 @@ int main (void)
 
                                 animatedModel.setAnimationRange("walk");
 
-                                if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
+                                if(font.load("fonts/Jellee-Roman.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;
                                 }
 
@@ -126,15 +124,15 @@ int main (void)
                                 std::vector<Engine::GL::Texture> buttonApperance(3 * 3 * 4);
                                 Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button.png");
 
-                                Engine::GL::Button testButton(buttonApperance, 20, 100 + 35 * 1, 200, 30);
-                                Engine::GL::Button testButton2(buttonApperance, 20, 100 + 35 * 2, 200, 30);
-                                Engine::GL::Button testButton3(buttonApperance, 20, 100 + 35 * 3, 200, 30);
-                                Engine::GL::Button testButton4(buttonApperance, 20, 100 + 35 * 4, 200, 30);
+                                Engine::GL::Button testButton(buttonApperance, 22, 100 + 35 * 1, 200, 30);
+                                Engine::GL::Button testButton2(buttonApperance, 22, 100 + 35 * 2, 200, 30);
+                                Engine::GL::Button testButton3(buttonApperance, 22, 100 + 35 * 3, 200, 30);
+                                Engine::GL::Button testButton4(buttonApperance, 22, 100 + 35 * 4, 200, 30);
 
-                                testButton.setText(font, 22, "Walk");
-                                testButton2.setText(font, 22, "Attack");
-                                testButton3.setText(font, 22, "Jump");
-                                testButton4.setText(font, 22, "Backflip");
+                                testButton.setText(font, 18, "Walk");
+                                testButton2.setText(font, 18, "Attack");
+                                testButton3.setText(font, 18, "Jump");
+                                testButton4.setText(font, 18, "Backflip");
 
                                 Engine::MouseHandler mouseHandler;
                                 mouseHandler.addButton(testButton);
@@ -210,12 +208,12 @@ int main (void)
 
 
                                     graphics.begin2D();
+                                        textField.draw(graphics);
+                                        console.draw(graphics);
                                         testButton.draw(graphics);
                                         testButton2.draw(graphics);
                                         testButton3.draw(graphics);
                                         testButton4.draw(graphics);
-                                        textField.draw(graphics);
-                                        console.draw(graphics);
                                     graphics.end2D();
 
                                     SDL_GL_SwapWindow(window);

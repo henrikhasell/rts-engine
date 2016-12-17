@@ -46,6 +46,7 @@ void Console::submitInput(Font &font, lua_State *luaState)
     {
         // Append the input string to the output:
         appendOutput(font, inputString.data());
+        /*
         // Pass the input string to Lua:
         int result = luaL_loadbuffer(luaState, inputString.data(), inputString.length(), "input") || lua_pcall(luaState, 0, 0, 0);
         // Check for Lua errors:
@@ -56,6 +57,7 @@ void Console::submitInput(Font &font, lua_State *luaState)
             // Append the error message to the console's output:
             appendOutput(font, errorMessage);
         }
+        */
         // Clear the input string:
         inputString.clear();
     }

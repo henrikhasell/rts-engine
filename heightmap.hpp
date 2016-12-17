@@ -2,7 +2,7 @@
 #define HEIGHTMAP_HPP
 
 #include <SDL2/SDL.h>
-#include <btBulletDynamicsCommon.h>
+//#include <btBulletDynamicsCommon.h>
 #include "graphics.hpp"
 #include "mesh3d.hpp"
 
@@ -22,7 +22,7 @@ public:
     void draw(const Graphics &graphics) const;
     bool load(const char path[]);
     void generateMesh();
-    btBvhTriangleMeshShape * generateCollisionMesh();
+    //btBvhTriangleMeshShape * generateCollisionMesh();
 protected:
     Mesh3D mesh;
     float *height;

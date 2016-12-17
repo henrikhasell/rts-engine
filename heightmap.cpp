@@ -101,6 +101,7 @@ void Heightmap::generateMesh()
     mesh.setIndices(indexArray);
 }
 
+/*
 btBvhTriangleMeshShape *Heightmap::generateCollisionMesh()
 {
     btScalar *collisionVertices = new btScalar[w * h * 3];
@@ -152,3 +153,4 @@ btBvhTriangleMeshShape *Heightmap::generateCollisionMesh()
 
     return new btBvhTriangleMeshShape(meshInterface, true);
 }
+*/
