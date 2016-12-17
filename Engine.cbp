@@ -38,7 +38,6 @@
 			<Add directory="/usr/include/bullet" />
 		</Compiler>
 		<Linker>
-			<Add library="lua5.2" />
 			<Add library="assimp" />
 			<Add library="SDL2" />
 			<Add library="SDL2_ttf" />
@@ -46,9 +45,6 @@
 			<Add library="GLEW" />
 			<Add library="GL" />
 			<Add library="GLU" />
-			<Add library="BulletCollision" />
-			<Add library="BulletDynamics" />
-			<Add library="LinearMath" />
 		</Linker>
 		<Unit filename="animation.cpp" />
 		<Unit filename="animation.hpp" />
