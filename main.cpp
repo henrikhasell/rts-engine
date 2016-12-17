@@ -27,6 +27,24 @@
 #define SCREEN_HEIGHT 720
 #define TIME_STEP_LENGTH 1000/60
 
+Engine::GL::AnimatedModel *globalModel = nullptr;
+
+void setWalkAnim(){
+    globalModel->setAnimationRange("walk");
+}
+
+void setAttackAnim(){
+    globalModel->setAnimationRange("attack1");
+}
+
+void setJumpAnim(){
+    globalModel->setAnimationRange("jump");
+}
+
+void setBackflipAnim(){
+    globalModel->setAnimationRange("backflip");
+}
+
 int main (void)
 {
     if(SDL_Init(SDL_INIT_VIDEO) == 0)
@@ -107,7 +125,9 @@ int main (void)
 
                                 animatedModel.setAnimationRange("walk");
 
-                                if(font.load("fonts/Jellee-Roman.ttf") == true) {
+                                globalModel = &animatedModel;
+
+                                if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;
                                 }
 
@@ -133,6 +153,11 @@ int main (void)
                                 testButton2.setText(font, 18, "Attack");
                                 testButton3.setText(font, 18, "Jump");
                                 testButton4.setText(font, 18, "Backflip");
+
+                                testButton.setCallback(setWalkAnim);
+                                testButton2.setCallback(setAttackAnim);
+                                testButton3.setCallback(setJumpAnim);
+                                testButton4.setCallback(setBackflipAnim);
 
                                 Engine::MouseHandler mouseHandler;
                                 mouseHandler.addButton(testButton);

@@ -61,6 +61,9 @@ bool MouseHandler::handleMouseButtonEvent(SDL_MouseButtonEvent *event)
             event->y >= selected->position.y && event->y <= selected->position.y + selected->h
             )
             {
+                if(selected->callback) {
+                    selected->callback();
+                }
                 selected->state = GL::Button::State::HOVER;
             }
             else

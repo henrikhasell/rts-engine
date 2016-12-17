@@ -24,6 +24,7 @@ public:
     ~Button();
     void draw(const Graphics &graphics) const;
     void setText(GL::Font &font, int size, const char text[]);
+    void setCallback(void (*callback)(void));
 private:
     void buildMesh(const std::vector<Texture> &apperance);
     GL::TextField textField;
@@ -32,6 +33,7 @@ private:
     glm::vec2 position;
     glm::vec2 textPosition;
     State state;
+    void (*callback)(void);
     float w;
     float h;
 }; // Button

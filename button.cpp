@@ -5,7 +5,7 @@ using namespace Engine;
 using namespace GL;
 
 Button::Button(std::vector<Texture> &apperance, float x, float y, float w, float h) :
-    apperance(apperance), mesh(3 * 3), position(x, y), state(NORMAL), w(w), h(h)
+    apperance(apperance), mesh(3 * 3), position(x, y), state(NORMAL), callback(nullptr), w(w), h(h)
 {
     int edgeW = apperance[0].getW();
     int edgeH = apperance[0].getH();
@@ -24,6 +24,11 @@ Button::Button(std::vector<Texture> &apperance, float x, float y, float w, float
 Button::~Button()
 {
     //dtor
+}
+
+void Button::setCallback(void (*callback)(void))
+{
+    this->callback = callback;
 }
 
 void Button::buildMesh(const std::vector<Texture> &apperance)
@@ -50,8 +55,8 @@ void Button::draw(const Graphics &graphics) const
     {
         apperance[index + i].bind();
         mesh[i].draw(graphics, position);
-        textField.draw(graphics, state == PRESSED ? textPosition + 2.0f : textPosition);
     }
+    textField.draw(graphics, state == PRESSED ? textPosition + 2.0f : textPosition);
 }
 
 void Button::setText(GL::Font &font, int size, const char text[])

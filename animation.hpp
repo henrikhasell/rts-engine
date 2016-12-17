@@ -94,7 +94,7 @@ public:
     AnimatedMesh();
     ~AnimatedMesh();
     bool loadMesh(const aiMesh *mesh);
-    void draw(const Graphics &graphics, double timeElapsed) const;
+    void draw(const Graphics &graphics) const;
 private:
     GLuint buffer[6];
     GLuint numberOfIndices;

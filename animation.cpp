@@ -33,28 +33,29 @@ AnimatedModel::~AnimatedModel()
     }
 }
 
-    bool AnimatedModel::setAnimationRange(const char name[])
+bool AnimatedModel::setAnimationRange(const char name[])
+{
+    const std::string animationName(name);
+
+    std::map<std::string, std::pair<double, double>>::iterator i = animationRanges.find(animationName);
+    bool result = i != animationRanges.end();
+
+    if(result)
     {
-        const std::string animationName(name);
-
-        std::map<std::string, std::pair<double, double>>::iterator i = animationRanges.find(animationName);
-        bool result = i != animationRanges.end();
-
-        if(result)
-        {
-            animationRange = &(*i).second;
-        }
-        else
-        {
-            std::cerr << "Cannot find animation " << animationName << std::endl;
-        }
-
-        return result;
+        animationRange = &(*i).second;
     }
-    void AnimatedModel::addAnimationRange(const char name[], double start, double finish)
+    else
     {
-        animationRanges[std::string(name)] = std::pair<double, double>(start, finish);
+        std::cerr << "Cannot find animation " << animationName << std::endl;
     }
+
+    return result;
+}
+
+void AnimatedModel::addAnimationRange(const char name[], double start, double finish)
+{
+    animationRanges[std::string(name)] = std::pair<double, double>(start, finish);
+}
 
 void AnimatedModel::setTexture(size_t index, const char path[])
 {
@@ -138,17 +139,6 @@ bool AnimatedModel::loadScene(const aiScene *scene)
 
 void AnimatedModel::draw(const Graphics &graphics, double timeElapsed)
 {
-/*
-    if(animationRange)
-    {std::cout << "Capping range!" << std::endl;
-        if(timeElapsed < animationRange->first)
-            timeElapsed = animationRange->first;
-        else if(timeElapsed > animationRange->second)
-            timeElapsed = fmod(timeElapsed, animationRange->second);
-    }
-*/
-
-
     for(unsigned int i = 0; i < scene->mNumMeshes; i++)
     {
         aiMesh *currentMesh = scene->mMeshes[i];
@@ -161,7 +151,7 @@ void AnimatedModel::draw(const Graphics &graphics, double timeElapsed)
         std::vector<glm::mat4x4> boneMatrices = calculateBoneMatrices(currentMesh, timeElapsed);
         glUniformMatrix4fv(graphics.uniformBoneMatricesAnim, 64, GL_FALSE, (GLfloat*)&boneMatrices[0]);
         textureArray[currentMesh->mMaterialIndex].bind();
-        meshArray[i].draw(graphics, timeElapsed);
+        meshArray[i].draw(graphics);
     }
 }
 
@@ -498,7 +488,7 @@ bool AnimatedMesh::loadMesh(const aiMesh *mesh)
     return true;
 }
 
-void AnimatedMesh::draw(const Graphics &graphics, double timeElapsed) const
+void AnimatedMesh::draw(const Graphics &graphics) const
 {
     glBindBuffer(GL_ARRAY_BUFFER, buffer[POSITION_BUFFER]);
     glVertexAttribPointer(graphics.attributePositionAnim, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
