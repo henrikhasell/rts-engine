@@ -149,7 +149,7 @@ void AnimatedModel::draw(const Graphics &graphics, double timeElapsed)
         }
 
         std::vector<glm::mat4x4> boneMatrices = calculateBoneMatrices(currentMesh, timeElapsed);
-        glUniformMatrix4fv(graphics.uniformBoneMatricesAnim, 64, GL_FALSE, (GLfloat*)&boneMatrices[0]);
+        glUniformMatrix4fv(graphics.uniformBoneMatrices3D, 64, GL_FALSE, (GLfloat*)&boneMatrices[0]);
         textureArray[currentMesh->mMaterialIndex].bind();
         meshArray[i].draw(graphics);
     }
@@ -491,19 +491,19 @@ bool AnimatedMesh::loadMesh(const aiMesh *mesh)
 void AnimatedMesh::draw(const Graphics &graphics) const
 {
     glBindBuffer(GL_ARRAY_BUFFER, buffer[POSITION_BUFFER]);
-    glVertexAttribPointer(graphics.attributePositionAnim, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(graphics.attributePosition3D, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[NORMAL_BUFFER]);
-    glVertexAttribPointer(graphics.attributeNormalAnim, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(graphics.attributeNormal3D, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[TEXCOORD_BUFFER]);
-    glVertexAttribPointer(graphics.attributeTexCoordAnim, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(graphics.attributeTexCoord3D, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[BONE_INDEX_BUFFER]);
-    glVertexAttribPointer(graphics.attributeBoneIndicesAnim, 4, GL_UNSIGNED_INT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(graphics.attributeBoneIndices3D, 4, GL_UNSIGNED_INT, GL_FALSE, 0, (void*)0);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffer[BONE_WEIGHT_BUFFER]);
-    glVertexAttribPointer(graphics.attributeBoneWeightsAnim, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(graphics.attributeBoneWeights3D, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer[INDEX_BUFFER]);
     glDrawElements(GL_TRIANGLES, numberOfIndices, GL_UNSIGNED_INT, (void*)0);

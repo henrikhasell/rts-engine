@@ -72,7 +72,6 @@ void Heightmap::generateMesh()
             const GLfloat vz = (GLfloat)(HEIGHTMAP_TILE_H * z);
 
             vertexArray.emplace_back(vx, vy, vz);
-
         }
     }
 

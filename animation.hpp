@@ -113,13 +113,19 @@ public:
     void addAnimationRange(const char name[], double start, double finish);
 private:
     std::map<std::string, std::pair<double, double>> animationRanges;
-    std::vector<glm::mat4x4> calculateBoneMatrices(const aiMesh* mesh, double timeElapsed);
-    glm::mat4x4 getNodeTransform(const aiNode *node, double timeElapsed);
-    std::map<std::string, aiNode*> nodesByName;
-    std::map<std::string, aiNodeAnim*> channelsByName;
     std::vector<AnimatedMesh> meshArray;
     std::vector<Texture> textureArray;
     std::pair<double, double> *animationRange;
+
+    // Dirty, assimp specific methods:
+    std::vector<glm::mat4x4> calculateBoneMatrices(const aiMesh* mesh, double timeElapsed);
+    glm::mat4x4 getNodeTransform(const aiNode *node, double timeElapsed);
+
+    // Dirty, assimp specific variables:
+
+    std::map<std::string, aiNode*> nodesByName;
+    std::map<std::string, aiNodeAnim*> channelsByName;
+
     const aiScene *scene;
 }; // AnimatedModel
 }; // GL

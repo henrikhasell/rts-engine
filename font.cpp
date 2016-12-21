@@ -26,7 +26,7 @@ bool Font::load(const char path[])
     return file != nullptr;
 }
 
-bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[], int size, float &w, float &h)
+bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[], int size)
 {
     std::map<const int,TTF_Font*>::const_iterator i = fontMap.find(size);
 
@@ -49,10 +49,7 @@ bool Font::renderString(Mesh2D &mesh, Texture &texture, const char string[], int
 
     if(surface)
     {
-        w = (float)surface->w;
-        h = (float)surface->h;
-
-        Mesh2D::createRectangle(mesh, 0.0f, 0.0f, w, h);
+        Mesh2D::createRectangle(mesh, 0.0f, 0.0f, (float)surface->w, (float)surface->h);
 
         texture.load(surface);
 

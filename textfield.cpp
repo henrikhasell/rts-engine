@@ -15,7 +15,14 @@ TextField::~TextField()
 
 bool TextField::setText(Font &font, int size, const char text[])
 {
-    return font.renderString(mesh, texture, text, size, w, h);
+    bool result = font.renderString(mesh, texture, text, size);
+
+    if(result)
+    {
+        w = (float)texture.getW();
+        h = (float)texture.getH();
+    }
+    return result;
 }
 
 void TextField::draw(const Graphics &graphics) const

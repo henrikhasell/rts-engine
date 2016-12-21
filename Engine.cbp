@@ -45,6 +45,7 @@
 			<Add library="GLEW" />
 			<Add library="GL" />
 			<Add library="GLU" />
+			<Add library="lua5.3" />
 		</Linker>
 		<Unit filename="animation.cpp" />
 		<Unit filename="animation.hpp" />
@@ -61,6 +62,7 @@
 		<Unit filename="heightmap.cpp" />
 		<Unit filename="heightmap.hpp" />
 		<Unit filename="main.cpp" />
+		<Unit filename="main.lua" />
 		<Unit filename="mesh2d.cpp" />
 		<Unit filename="mesh2d.hpp" />
 		<Unit filename="mesh3d.cpp" />
@@ -76,10 +78,10 @@
 		<Unit filename="shader.hpp" />
 		<Unit filename="shaders/fragment2D.glsl" />
 		<Unit filename="shaders/fragment3D.glsl" />
-		<Unit filename="shaders/fragmentAnim.glsl" />
 		<Unit filename="shaders/vertex2D.glsl" />
 		<Unit filename="shaders/vertex3D.glsl" />
-		<Unit filename="shaders/vertexAnim.glsl" />
+		<Unit filename="text.cpp" />
+		<Unit filename="text.hpp" />
 		<Unit filename="textfield.cpp" />
 		<Unit filename="textfield.hpp" />
 		<Unit filename="texture.cpp" />

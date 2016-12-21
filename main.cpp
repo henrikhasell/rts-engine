@@ -6,6 +6,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <GL/glew.h>
+#include <lua5.3/lua.hpp>
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
 
@@ -27,7 +28,166 @@
 #define SCREEN_HEIGHT 720
 #define TIME_STEP_LENGTH 1000/60
 
+Engine::GL::Graphics *globalGraphics=nullptr;
+std::vector<Engine::GL::Texture> *globalButtonApperance = nullptr;
 Engine::GL::AnimatedModel *globalModel = nullptr;
+Engine::GL::Font *globalFont = nullptr;
+Engine::MouseHandler *globalMouseHandler = nullptr;
+
+std::list<void*> allocated;
+
+int lua_Model_draw(lua_State *luaState)
+{
+    double timeElapsed = lua_tonumber(luaState, 2);
+
+    lua_getfield(luaState, 1, "pointer");
+        Engine::GL::AnimatedModel *model = (Engine::GL::AnimatedModel*)lua_touserdata(luaState, -1);
+        model->draw(*globalGraphics, timeElapsed);
+    lua_pop(luaState, 1);
+
+    return 0;
+}
+
+int lua_Model_loadTexture(lua_State *luaState)
+{
+    const char *path = lua_tostring(luaState, 2);
+
+    lua_getfield(luaState, 1, "pointer");
+        Engine::GL::AnimatedModel *model = (Engine::GL::AnimatedModel*)lua_touserdata(luaState, -1);
+        model->setTexture(0, path);
+    lua_pop(luaState, 1);
+
+    return 0;
+}
+
+int lua_Model_addAnimationRange(lua_State *luaState)
+{
+    const char *name = lua_tostring(luaState, 2);
+    double min = lua_tonumber(luaState, 3);
+    double max = lua_tonumber(luaState, 4);
+
+    lua_getfield(luaState, 1, "pointer");
+        Engine::GL::AnimatedModel *model = (Engine::GL::AnimatedModel*)lua_touserdata(luaState, -1);
+        model->addAnimationRange(name, min, max);
+    lua_pop(luaState, 1);
+
+    return 0;
+}
+
+int lua_Model_setAnimationRange(lua_State *luaState)
+{
+    const char *name = lua_tostring(luaState, 2);
+
+    lua_getfield(luaState, 1, "pointer");
+        Engine::GL::AnimatedModel *model = (Engine::GL::AnimatedModel*)lua_touserdata(luaState, -1);
+        model->setAnimationRange(name);
+    lua_pop(luaState, 1);
+    return 0;
+}
+
+int lua_Button_draw(lua_State *luaState)
+{
+    lua_getfield(luaState, 1, "pointer");
+        Engine::GL::Button *button = (Engine::GL::Button*)lua_touserdata(luaState, -1);
+        button->draw(*globalGraphics);
+    lua_pop(luaState, 1);
+
+    return 0;
+}
+
+int lua_Button_setText(lua_State *luaState)
+{
+    const char *text = lua_tostring(luaState, 2);
+
+    lua_getfield(luaState, 1, "pointer");
+        Engine::GL::Button *button = (Engine::GL::Button*)lua_touserdata(luaState, -1);
+        button->setText(*globalFont, FONT_SIZE, text);
+    lua_pop(luaState, 1);
+
+    return 0;
+}
+
+int createButton(lua_State *luaState)
+{
+    std::cout << "Creating button..." << std::endl;
+    double x, y, w, h;
+    const char *text;
+
+    x = lua_tonumber(luaState, 1);
+    y = lua_tonumber(luaState, 2);
+    w = lua_tonumber(luaState, 3);
+    h = lua_tonumber(luaState, 4);
+    text = lua_tostring(luaState, 5);
+
+    std::cout << "Size: " << x << ", " << y << ", " << w << ", " << h << std::endl;
+    // Create new button object:
+    Engine::GL::Button *button = new Engine::GL::Button(*globalButtonApperance, x, y, w, h);
+    // Set the button text:
+    button->setText(*globalFont, FONT_SIZE, text);
+    // Add newly allocated object to array to be freed on exit:
+    allocated.emplace_back(button);
+    // Add the new button to the mouse handler:
+    globalMouseHandler->addButton(*button);
+
+    // Create a new table to store the button:
+    lua_newtable(luaState);
+
+    // Add pointer value to table:
+    lua_pushstring(luaState, "pointer");
+    lua_pushlightuserdata(luaState, button);
+    lua_settable(luaState, -3);
+
+    // Add draw value to table:
+    lua_pushstring(luaState, "draw");
+    lua_pushcfunction(luaState, lua_Button_draw);
+    lua_settable(luaState, -3);
+
+    // Add setText value to table:
+    lua_pushstring(luaState, "setText");
+    lua_pushcfunction(luaState, lua_Button_setText);
+    lua_settable(luaState, -3);
+
+    // Number of values returned:
+    return 1;
+}
+
+int createMesh(lua_State *luaState)
+{
+    const char *path = lua_tostring(luaState, 1);
+    Engine::GL::AnimatedModel *model = new Engine::GL::AnimatedModel();
+    allocated.emplace_back(model);
+    model->loadFile(path);
+    model->setTexture(0,"models/ninja/nskingr.jpg");
+    model->addAnimationRange("walk", 1, 14);
+    model->setAnimationRange("walk");
+
+    // Create a new table to store the button:
+    lua_newtable(luaState);
+
+    lua_pushstring(luaState, "pointer");
+    lua_pushlightuserdata(luaState, model);
+    lua_settable(luaState, -3);
+
+    lua_pushstring(luaState, "loadTexture");
+    lua_pushcfunction(luaState, lua_Model_loadTexture);
+    lua_settable(luaState, -3);
+
+    lua_pushstring(luaState, "addAnimationRange");
+    lua_pushcfunction(luaState, lua_Model_addAnimationRange);
+    lua_settable(luaState, -3);
+
+    lua_pushstring(luaState, "setAnimationRange");
+    lua_pushcfunction(luaState, lua_Model_setAnimationRange);
+    lua_settable(luaState, -3);
+
+    lua_pushstring(luaState, "draw");
+    lua_pushcfunction(luaState, lua_Model_draw);
+    lua_settable(luaState, -3);
+
+    // Number of values returned:
+    return 1;
+}
+
 
 void setWalkAnim(){
     globalModel->setAnimationRange("walk");
@@ -97,16 +257,35 @@ int main (void)
                             if(graphics.initialise() == true)
                             {
                                 bool finished = false;
-
+                                globalGraphics = &graphics;
                                 std::cout << "Successfully initialised the graphics sub-system." << std::endl;
+
+                                lua_State *luaState = luaL_newstate();
+                                luaL_openlibs(luaState);// Load Lua standard library.
+
+                                lua_newtable(luaState);
+
+                                    lua_pushstring(luaState, "createButton");
+                                    lua_pushcfunction(luaState, createButton);
+                                    lua_settable(luaState, -3);
+
+                                    lua_pushstring(luaState, "createMesh");
+                                    lua_pushcfunction(luaState, createMesh);
+                                    lua_settable(luaState, -3);
+
+                                    lua_pushstring(luaState, "draw");
+                                    lua_pushnil(luaState);
+                                    lua_settable(luaState, -3);
+
+                                lua_setglobal(luaState, "engine");
 
                                 Engine::GL::Font font;
                                 Engine::GL::TextField textField;
-                                Engine::GL::Model3D teapotModel;
                                 Engine::GL::Console console;
 
 
-
+                                //Engine::GL::Model3D teapotModel;
+/*
                                 Engine::GL::AnimatedModel animatedModel;
                                 animatedModel.loadFile("models/ninja/ninja.b3d");
                                 animatedModel.setTexture(0,"models/ninja/nskingr.jpg");
@@ -122,27 +301,30 @@ int main (void)
                                 animatedModel.addAnimationRange("death1", 166, 173);
                                 animatedModel.addAnimationRange("death2", 174, 182);
                                 animatedModel.addAnimationRange("kick", 73, 83);
-
                                 animatedModel.setAnimationRange("walk");
-
                                 globalModel = &animatedModel;
-
+*/
                                 if(font.load("fonts/NanumGothic-Bold.ttf") == true) {
                                     std::cout << "Successfully loaded font!" << std::endl;
                                 }
+                                globalFont = &font;
 
-                                textField.setText(font, FONT_SIZE, "Hello, world!");
+                                std::vector<Engine::GL::Texture> buttonApperance(3 * 3 * 4);
+                                Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button.png");
+                                globalButtonApperance = &buttonApperance;
+
+                                textField.setText(font, FONT_SIZE, "안녕하세요, 세계!");
 /*
                                 if(font.renderString(text, "Hello, world!") == true) {
                                     std::cout << "Successfully created text mesh!" << std::endl;
                                 }
 */
+/*
                                 if(teapotModel.loadFile("models/teapot.obj") == true) {
                                     std::cout << "Successfully loaded teapot!" << std::endl;
                                 }
-
-                                std::vector<Engine::GL::Texture> buttonApperance(3 * 3 * 4);
-                                Engine::GL::Texture::loadSpriteSheet(buttonApperance, "assets/gui/button.png");
+*/
+/*
 
                                 Engine::GL::Button testButton(buttonApperance, 22, 100 + 35 * 1, 200, 30);
                                 Engine::GL::Button testButton2(buttonApperance, 22, 100 + 35 * 2, 200, 30);
@@ -159,11 +341,19 @@ int main (void)
                                 testButton3.setCallback(setJumpAnim);
                                 testButton4.setCallback(setBackflipAnim);
 
-                                Engine::MouseHandler mouseHandler;
                                 mouseHandler.addButton(testButton);
                                 mouseHandler.addButton(testButton2);
                                 mouseHandler.addButton(testButton3);
                                 mouseHandler.addButton(testButton4);
+*/
+                                Engine::MouseHandler mouseHandler;
+                                globalMouseHandler = &mouseHandler;
+
+                                if(luaL_dofile(luaState, "main.lua") != 0)
+                                {
+                                    console.appendOutput(font, lua_tostring(luaState, -1));
+                                    lua_pop(luaState, 1);
+                                }
 
                                 Uint32 timeStep = 0;
 
@@ -195,7 +385,7 @@ int main (void)
                                                 }
                                                 if(event.key.keysym.scancode == SDL_SCANCODE_RETURN)
                                                 {
-
+                                                    console.submitInput(font, luaState);
                                                 }
                                             }
                                             else if(event.type == SDL_MOUSEMOTION)
@@ -227,18 +417,30 @@ int main (void)
                                         // teapotModel.draw(graphics);
                                     //graphics.end3D();
 
-                                    graphics.beginAnim();
-                                        animatedModel.draw(graphics, (double)SDL_GetTicks() / 100.0);
-                                    graphics.endAnim();
+
+                                    graphics.begin3D();
+                                    lua_getglobal(luaState, "engine");
+                                        lua_getfield(luaState, -1, "draw3D");
+                                        lua_pushnumber(luaState, SDL_GetTicks());
+                                        lua_pcall(luaState, 1, 0, 0);
+                                    lua_pop(luaState, 1);
+                                    graphics.end3D();
 
 
                                     graphics.begin2D();
-                                        textField.draw(graphics);
+                                        textField.draw(graphics, glm::vec2(0, 0));
                                         console.draw(graphics);
+
+                                    lua_getglobal(luaState, "engine");
+                                        lua_getfield(luaState, -1, "draw2D");
+                                        lua_pcall(luaState, 0, 0, 0);
+                                    lua_pop(luaState, 1);
+                                        /*
                                         testButton.draw(graphics);
                                         testButton2.draw(graphics);
                                         testButton3.draw(graphics);
                                         testButton4.draw(graphics);
+                                        */
                                     graphics.end2D();
 
                                     SDL_GL_SwapWindow(window);
@@ -247,6 +449,8 @@ int main (void)
                                     timeStep += frameTime;
 
                                 }
+
+                                lua_close(luaState);
                             }
                             else
                             {

@@ -15,10 +15,10 @@ Console::~Console()
 
 void Console::appendOutput(Font &font, const char output[])
 {
-    // Add a new mesh to the output array:
+    // Add a new text field to the output array:
     outputText.emplace_back();
-    // Initialise the text within the mesh:
-    //font.renderString(outputMesh.back(), output);
+    // Set the text field text:
+    outputText.back().setText(font, FONT_SIZE, output);
     // Arbitrarily limit the length of the output list:
     if(outputText.size() > 20)
     {
@@ -46,7 +46,7 @@ void Console::submitInput(Font &font, lua_State *luaState)
     {
         // Append the input string to the output:
         appendOutput(font, inputString.data());
-        /*
+
         // Pass the input string to Lua:
         int result = luaL_loadbuffer(luaState, inputString.data(), inputString.length(), "input") || lua_pcall(luaState, 0, 0, 0);
         // Check for Lua errors:
@@ -57,7 +57,7 @@ void Console::submitInput(Font &font, lua_State *luaState)
             // Append the error message to the console's output:
             appendOutput(font, errorMessage);
         }
-        */
+
         // Clear the input string:
         inputString.clear();
     }
@@ -90,7 +90,7 @@ void Console::backspace(Font &font)
 void Console::draw(const Graphics &graphics)
 {
     // Arbitrary offset:
-    glm::vec2 offset(0.0f, FONT_SIZE * 2.0f);
+    glm::vec2 offset(0.0f, FONT_SIZE);
 
     for(TextField &field : outputText)
     {

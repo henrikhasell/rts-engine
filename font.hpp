@@ -17,7 +17,7 @@ class Font
         Font();
         ~Font();
         bool load(const char path[]);
-        bool renderString(Mesh2D &mesh, Texture &texture, const char string[], int size, float &w, float &h);
+        bool renderString(Mesh2D &mesh, Texture &texture, const char string[], int size);
     private:
         std::map<const int, TTF_Font*> fontMap;
         SDL_RWops * file;

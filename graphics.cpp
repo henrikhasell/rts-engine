@@ -9,10 +9,8 @@ using namespace GL;
 Graphics::Graphics(SDL_Window *window) :
     fragmentShader3D(GL_FRAGMENT_SHADER),
     fragmentShader2D(GL_FRAGMENT_SHADER),
-    fragmentShaderAnim(GL_FRAGMENT_SHADER),
     vertexShader3D(GL_VERTEX_SHADER),
-    vertexShader2D(GL_VERTEX_SHADER),
-    vertexShaderAnim(GL_VERTEX_SHADER)
+    vertexShader2D(GL_VERTEX_SHADER)
 {
     int w;
     int h;
@@ -21,23 +19,11 @@ Graphics::Graphics(SDL_Window *window) :
 
     GLfloat aspectRatio = (GLfloat)w/(GLfloat)h;
 
-    matrixP3D = glm::perspective(45.0f, aspectRatio, 1.0f, 10000.0f);
-
     matrixP2D = glm::ortho(0.0f, (GLfloat)w, (GLfloat)h, 0.0f);
 
+    matrixP3D = glm::perspective(45.0f, aspectRatio, 1.0f, 10000.0f);
+
     matrixV3D =  glm::lookAt(
-        glm::vec3(
-            0.f,
-            100.0f,
-            200.0f
-        ),
-        glm::vec3( 0.0f, 0.0f, 0.0f ),
-        glm::vec3( 0.0f, 1.0f, 0.0f )
-    );
-
-    matrixPAnim = glm::perspective(45.0f, aspectRatio, 1.0f, 10000.0f);
-
-    matrixVAnim =  glm::lookAt(
         glm::vec3(
             10.f,
             5.0f,
@@ -50,7 +36,7 @@ Graphics::Graphics(SDL_Window *window) :
 
 bool Graphics::initialise()
 {
-    bool result = initialise2D() && initialise3D() && initialiseAnim();
+    bool result = initialise2D() && initialise3D();
 
     if(result)
     {
@@ -61,7 +47,7 @@ bool Graphics::initialise()
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+        glClearColor(0.5f, 0.5f, 1.0f, 0.0f);
         //glFrontFace(GL_CW);
     }
 
@@ -134,39 +120,6 @@ bool Graphics::initialise3D()
     return result;
 }
 
-bool Graphics::initialiseAnim()
-{
-    bool result = false;
-
-    if(fragmentShaderAnim.load("shaders/fragmentAnim.glsl") == true)
-    {
-        if(vertexShaderAnim.load("shaders/vertexAnim.glsl") == true)
-        {
-            if(programAnim.link(fragmentShaderAnim, vertexShaderAnim) == true)
-            {
-                glUseProgram(programAnim.program);
-                getAttribsAnim();
-                getUniformsAnim();
-                result = true;
-            }
-            else
-            {
-                std::cerr << "Failed to link program: " << programAnim.infoLog() << std::endl;
-            }
-        }
-        else
-        {
-            std::cerr << "Failed to compile vertex shader: " << vertexShaderAnim.infoLog() << std::endl;
-        }
-    }
-    else
-    {
-        std::cerr << "Failed to compile fragment shader: " << fragmentShaderAnim.infoLog() << std::endl;
-    }
-
-    return result;
-}
-
 void Graphics::getAttribs2D()
 {
     attributePosition2D = glGetAttribLocation(program2D.program, "in_Position");
@@ -177,15 +130,9 @@ void Graphics::getAttribs3D()
 {
     attributePosition3D = glGetAttribLocation(program3D.program, "in_Position");
     attributeNormal3D = glGetAttribLocation(program3D.program, "in_Normal");
-}
-
-void Graphics::getAttribsAnim()
-{
-    attributePositionAnim = glGetAttribLocation(programAnim.program, "in_Position");
-    attributeNormalAnim = glGetAttribLocation(programAnim.program, "in_Normal");
-    attributeTexCoordAnim = glGetAttribLocation(programAnim.program, "in_TexCoord");
-    attributeBoneWeightsAnim = glGetAttribLocation(programAnim.program, "in_BoneWeights");
-    attributeBoneIndicesAnim = glGetAttribLocation(programAnim.program, "in_BoneIndices");
+    attributeTexCoord3D = glGetAttribLocation(program3D.program, "in_TexCoord");
+    attributeBoneWeights3D = glGetAttribLocation(program3D.program, "in_BoneWeights");
+    attributeBoneIndices3D = glGetAttribLocation(program3D.program, "in_BoneIndices");
 }
 
 void Graphics::getUniforms2D()
@@ -200,14 +147,7 @@ void Graphics::getUniforms3D()
     uniformP3D = glGetUniformLocation(program3D.program, "projectionMatrix");
     uniformV3D = glGetUniformLocation(program3D.program, "viewMatrix");
     uniformM3D = glGetUniformLocation(program3D.program, "modelMatrix");
-}
-
-void Graphics::getUniformsAnim()
-{
-    uniformPAnim = glGetUniformLocation(programAnim.program, "projectionMatrix");
-    uniformVAnim = glGetUniformLocation(programAnim.program, "viewMatrix");
-    uniformMAnim = glGetUniformLocation(programAnim.program, "modelMatrix");
-    uniformBoneMatricesAnim = glGetUniformLocation(programAnim.program, "boneMatrices");
+    uniformBoneMatrices3D = glGetUniformLocation(program3D.program, "boneMatrices");
 }
 
 void Graphics::begin2D()
@@ -224,27 +164,16 @@ void Graphics::begin2D()
 void Graphics::begin3D()
 {
     glUseProgram(program3D.program);
+
     glEnableVertexAttribArray(attributePosition3D);
     glEnableVertexAttribArray(attributeNormal3D);
+    glEnableVertexAttribArray(attributeTexCoord3D);
+    glEnableVertexAttribArray(attributeBoneWeights3D);
+    glEnableVertexAttribArray(attributeBoneIndices3D);
 
     glUniformMatrix4fv(uniformP3D, 1, GL_FALSE, &matrixP3D[0][0]);
     glUniformMatrix4fv(uniformV3D, 1, GL_FALSE, &matrixV3D[0][0]);
     glUniformMatrix4fv(uniformM3D, 1, GL_FALSE, &matrixM3D[0][0]);
-}
-
-void Graphics::beginAnim()
-{
-    glUseProgram(programAnim.program);
-
-    glEnableVertexAttribArray(attributePositionAnim);
-    glEnableVertexAttribArray(attributeNormalAnim);
-    glEnableVertexAttribArray(attributeTexCoordAnim);
-    glEnableVertexAttribArray(attributeBoneWeightsAnim);
-    glEnableVertexAttribArray(attributeBoneIndicesAnim);
-
-    glUniformMatrix4fv(uniformPAnim, 1, GL_FALSE, &matrixPAnim[0][0]);
-    glUniformMatrix4fv(uniformVAnim, 1, GL_FALSE, &matrixVAnim[0][0]);
-    glUniformMatrix4fv(uniformMAnim, 1, GL_FALSE, &matrixMAnim[0][0]);
 }
 
 void Graphics::end2D()
@@ -256,19 +185,12 @@ void Graphics::end2D()
 
 void Graphics::end3D()
 {
+
     glDisableVertexAttribArray(attributePosition3D);
     glDisableVertexAttribArray(attributeNormal3D);
-
-}
-
-void Graphics::endAnim()
-{
-
-    glDisableVertexAttribArray(attributePositionAnim);
-    glDisableVertexAttribArray(attributeNormalAnim);
-    glDisableVertexAttribArray(attributeTexCoordAnim);
-    glDisableVertexAttribArray(attributeBoneWeightsAnim);
-    glDisableVertexAttribArray(attributeBoneIndicesAnim);
+    glDisableVertexAttribArray(attributeTexCoord3D);
+    glDisableVertexAttribArray(attributeBoneWeights3D);
+    glDisableVertexAttribArray(attributeBoneIndices3D);
 }
 
 void Graphics::translate3D(const glm::vec3 &position)
